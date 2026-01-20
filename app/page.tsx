@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { UserCircle, ShoppingBag, Hand, Star, FileText, Copy, Check, Loader2, Sparkles } from "lucide-react";
+import { UserCircle, ShoppingBag, Hand, Star, FileText, Copy, Check, Loader2, Sparkles, Landmark, Image } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import TabNavigation from "@/components/TabNavigation";
 import InfluencerTab, { InfluencerData } from "@/components/tabs/InfluencerTab";
@@ -9,8 +9,10 @@ import FashionTab, { FashionData } from "@/components/tabs/FashionTab";
 import POVProductTab, { POVProductData } from "@/components/tabs/POVProductTab";
 import InfluencerShowcaseTab, { InfluencerShowcaseData } from "@/components/tabs/InfluencerShowcaseTab";
 import ScriptTab, { ScriptData } from "@/components/tabs/ScriptTab";
+import ScenarioTab, { ScenarioData } from "@/components/tabs/ScenarioTab";
+import ThumbnailTab, { ThumbnailData } from "@/components/tabs/ThumbnailTab";
 
-type TabType = "influencer" | "fashion" | "pov" | "showcase" | "script";
+type TabType = "influencer" | "fashion" | "pov" | "showcase" | "script" | "scenario" | "thumbnail";
 
 export default function Home() {
     const [activeTab, setActiveTab] = useState<TabType>("influencer");
@@ -26,6 +28,8 @@ export default function Home() {
         { id: "pov", label: "POV Produto", icon: Hand },
         { id: "showcase", label: "Influencer + Produto", icon: Star },
         { id: "script", label: "Roteiro Viral", icon: FileText },
+        { id: "scenario", label: "🎭 Cenários", icon: Landmark },
+        { id: "thumbnail", label: "🖼️ Thumbnail", icon: Image },
     ];
 
     const handleError = (msg: string) => {
@@ -33,7 +37,7 @@ export default function Home() {
         setTimeout(() => setError(""), 4000);
     };
 
-    const handleGenerate = async (data: InfluencerData | FashionData | POVProductData | InfluencerShowcaseData | ScriptData) => {
+    const handleGenerate = async (data: InfluencerData | FashionData | POVProductData | InfluencerShowcaseData | ScriptData | ScenarioData | ThumbnailData) => {
         setIsLoading(true);
         setError("");
         setGeneratedPrompt("");
@@ -197,6 +201,20 @@ export default function Home() {
                                 )}
                                 {activeTab === "script" && (
                                     <ScriptTab
+                                        onGenerate={(data) => handleGenerate(data)}
+                                        isLoading={isLoading}
+                                        onError={handleError}
+                                    />
+                                )}
+                                {activeTab === "scenario" && (
+                                    <ScenarioTab
+                                        onGenerate={(data) => handleGenerate(data)}
+                                        isLoading={isLoading}
+                                        onError={handleError}
+                                    />
+                                )}
+                                {activeTab === "thumbnail" && (
+                                    <ThumbnailTab
                                         onGenerate={(data) => handleGenerate(data)}
                                         isLoading={isLoading}
                                         onError={handleError}

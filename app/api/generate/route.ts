@@ -497,6 +497,153 @@ Morphing, melting hands, text glitches, extra fingers, cartoon, drawing, paintin
                 return NextResponse.json({ prompt: finalPrompt });
             }
 
+            case "scenario": {
+                const { environmentType, visualStyle, lighting, details } = data;
+
+                if (!environmentType || !visualStyle || !lighting) {
+                    return NextResponse.json(
+                        { error: "Preencha todos os campos obrigatórios" },
+                        { status: 400 }
+                    );
+                }
+
+                const scenarioPrompt = `ACT AS A PROFESSIONAL ENVIRONMENT/SCENE DESIGNER FOR AI IMAGE GENERATION.
+
+**OBJECTIVE:** Create a highly detailed prompt for generating ONLY an environment/background scene with NO people.
+
+**INPUT DATA:**
+- Environment Type: ${environmentType}
+- Visual Style: ${visualStyle}
+- Lighting: ${lighting}
+- Extra Details: ${details || "None"}
+
+**TASK:**
+Generate a comprehensive prompt optimized for Flux/Midjourney/Stable Diffusion.
+
+**REQUIRED ELEMENTS:**
+1. **Scene Description:** Detailed view of the ${environmentType}. Be specific about architecture, furniture, objects.
+2. **Visual Style:** Apply ${visualStyle} aesthetic throughout (colors, mood, composition).
+3. **Lighting:** ${lighting} - describe how light interacts with surfaces, creates shadows, highlights textures.
+4. **Textures & Materials:** Specify materials (wood grain, metal finish, fabric weave, glass reflections).
+5. **Color Palette:** Exact color descriptions (avoid generic "blue", use "Deep Navy" or "Powder Blue").
+6. **Depth & Composition:** Foreground, midground, background elements to create depth.
+7. **Atmosphere:** Mood, feeling, ambiance of the space.
+
+**CRITICAL RULES:**
+- NO people, NO human figures, NO body parts visible.
+- Focus on the SPACE itself as the subject.
+- High level of photorealistic detail.
+- Mention camera specs: (e.g., "Shot on Sony A7R IV, 24mm wide angle, f/2.8").
+
+**OUTPUT FORMAT:**
+Provide a single, comma-separated prompt ready for image generation. No explanations, just the prompt.`;
+
+                const result = await model.generateContent(scenarioPrompt);
+                const response = result.response.text();
+
+                return NextResponse.json({ prompt: response });
+            }
+
+            case "thumbnail": {
+                const { expression, contentType, thumbnailText, influencerJSON, referenceImage } = data;
+
+                if (!expression || !thumbnailText) {
+                    return NextResponse.json(
+                        { error: "Preencha a expressão e o texto da thumbnail" },
+                        { status: 400 }
+                    );
+                }
+
+                // Parse influencer data if provided
+                let influencerDesc = "";
+                let hasInfluencer = false;
+                if (influencerJSON) {
+                    try {
+                        const influencerData = JSON.parse(influencerJSON);
+                        const subject = influencerData.subject;
+                        influencerDesc = `Specific person: ${subject.gender}, ${subject.age} years old, ${subject.ethnicity}, ${subject.hair?.color || 'styled'} hair, ${subject.eyes?.color || 'expressive'} eyes.`;
+                        hasInfluencer = true;
+                    } catch (e) {
+                        console.log("Invalid influencer JSON, using generic model");
+                    }
+                }
+
+                // Add reference image if provided
+                if (referenceImage) {
+                    imageParts.push(fileToGenerativePart(referenceImage, "image/jpeg"));
+                }
+
+                // Expression mapping
+                const expressionDetails: Record<string, string> = {
+                    shocked: "Wide open mouth, raised eyebrows, eyes fully open showing whites, hands on cheeks (Home Alone pose)",
+                    amazed: "Sparkling eyes, slight smile, eyebrows raised in wonder, leaning forward",
+                    mindblown: "Head tilted back, mouth open in awe, both hands on head, eyes wide",
+                    determined: "Intense eye contact, jaw clenched, eyebrows furrowed, confident posture",
+                    emotional: "Glassy eyes, soft smile or slight frown, hand on heart, vulnerable expression",
+                    smirk: "Half smile, one eyebrow raised, knowing look, arms crossed confidently",
+                    excited: "Huge smile, eyes sparkling, possibly jumping or energetic pose",
+                    skeptical: "One eyebrow raised, slight frown, arms crossed, judging look",
+                    laughing: "Big genuine laugh, eyes squinted, head thrown back, mouth wide open",
+                    serious: "Stern face, direct eye contact, no smile, focused intense stare"
+                };
+
+                const expressionDetail = expressionDetails[expression] || "Expressive face";
+
+                const thumbnailPrompt = imageParts.length > 0
+                    ? `Analyze this reference image and create a thumbnail prompt matching this expression.
+
+**THUMBNAIL SPECS:**
+- Expression: ${expressionDetail}
+- Content Type: ${contentType}
+- Text Overlay: "${thumbnailText}"
+${hasInfluencer ? `- Subject: ${influencerDesc}` : "- Subject: Attractive content creator"}
+
+Create a prompt for a HIGH-CTR YouTube/TikTok thumbnail following these rules:
+1. EXTREME CLOSE-UP of face (face fills 70% of frame)
+2. Crystal clear expression matching the reference
+3. High contrast, vibrant saturation
+4. Background: Blurred or simple gradient
+5. Perfect lighting on face (no harsh shadows)
+6. Text space reserved on thirds
+7. 16:9 aspect ratio, 1920x1080px
+
+Output format: Detailed prompt for thumbnail generation.`
+                    : `ACT AS A VIRAL THUMBNAIL DESIGNER.
+
+**OBJECTIVE:** Create a prompt for a HIGH-CTR YouTube/TikTok thumbnail.
+
+**SPECS:**
+- Expression: ${expressionDetail}
+- Content Type: ${contentType}
+- Text Overlay: "${thumbnailText}"
+${hasInfluencer ? `- Subject: ${influencerDesc}` : "- Subject: Attractive content creator (neutral ethnicity, 25-30 years old)"}
+
+**THUMBNAIL REQUIREMENTS:**
+1. **Framing:** EXTREME close-up portrait. Face fills 70% of the frame. Direct eye contact with camera.
+2. **Expression:** ${expressionDetail}. Make it EXAGGERATED and CLEAR from a distance.
+3. **Lighting:** Ring light or 3-point studio lighting. Face must be brightly lit, no harsh shadows.
+4. **Colors:** High saturation, high contrast. Pop off the screen.
+5. **Background:** Simple blurred background or solid gradient. Don't compete with face.
+6. **Text Space:** Leave clear space on top or bottom third for text overlay: "${thumbnailText}"
+7. **Quality:** 16:9 aspect ratio, 1920x1080px, hyper-realistic, sharp focus on eyes.
+8. **Emotion Clarity:** The ${expression} expression must be instantly readable even at small size.
+
+**NEGATIVE PROMPT:**
+Low contrast, dim lighting, blurry, multiple people, cluttered background, face too small, generic expression.
+
+**OUTPUT:**
+Provide a single detailed prompt optimized for Midjourney/Flux/DALL-E 3 for thumbnail generation. Comma-separated format.`;
+
+                const promptToUse = imageParts.length > 0
+                    ? [thumbnailPrompt, ...imageParts]
+                    : thumbnailPrompt;
+
+                const result = await model.generateContent(promptToUse);
+                const response = result.response.text();
+
+                return NextResponse.json({ prompt: response });
+            }
+
             default:
                 return NextResponse.json(
                     { error: "Tipo de tab inválido" },
