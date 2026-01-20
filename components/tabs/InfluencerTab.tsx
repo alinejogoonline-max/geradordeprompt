@@ -90,16 +90,21 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
                 <div className="space-y-2">
                     <div className="flex justify-between items-center ml-1">
                         <label className="text-sm font-semibold text-gray-300">Idade</label>
-                        <span className="text-accent-cyan font-bold">{age} anos</span>
+                        <span className="text-cyan-400 font-bold text-lg">{age} anos</span>
                     </div>
-                    <input
-                        type="range"
-                        min="18"
-                        max="60"
-                        value={age}
-                        onChange={(e) => setAge(Number(e.target.value))}
-                        className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer"
-                    />
+                    <div className="relative pt-1">
+                        <input
+                            type="range"
+                            min="18"
+                            max="60"
+                            value={age}
+                            onChange={(e) => setAge(Number(e.target.value))}
+                            className="age-slider w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer transition-all duration-150"
+                            style={{
+                                background: `linear-gradient(to right, rgb(34 211 238) 0%, rgb(34 211 238) ${((age - 18) / (60 - 18)) * 100}%, rgba(255,255,255,0.1) ${((age - 18) / (60 - 18)) * 100}%, rgba(255,255,255,0.1) 100%)`
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
 
