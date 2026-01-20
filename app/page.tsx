@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { UserCircle, ShoppingBag, Hand, Star, FileText, Copy, Check, Loader2, Sparkles, Landmark, Image } from "lucide-react";
+import { UserCircle, ShoppingBag, Hand, Star, FileText, Copy, Check, Loader2, Sparkles, Landmark, Image, Cat } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import TabNavigation from "@/components/TabNavigation";
 import InfluencerTab, { InfluencerData } from "@/components/tabs/InfluencerTab";
@@ -11,8 +11,9 @@ import InfluencerShowcaseTab, { InfluencerShowcaseData } from "@/components/tabs
 import ScriptTab, { ScriptData } from "@/components/tabs/ScriptTab";
 import ScenarioTab, { ScenarioData } from "@/components/tabs/ScenarioTab";
 import ThumbnailTab, { ThumbnailData } from "@/components/tabs/ThumbnailTab";
+import PetsTab, { PetsData } from "@/components/tabs/PetsTab";
 
-type TabType = "influencer" | "fashion" | "pov" | "showcase" | "script" | "scenario" | "thumbnail";
+type TabType = "influencer" | "fashion" | "pov" | "showcase" | "script" | "scenario" | "thumbnail" | "pets";
 
 export default function Home() {
     const [activeTab, setActiveTab] = useState<TabType>("influencer");
@@ -30,6 +31,7 @@ export default function Home() {
         { id: "script", label: "Roteiro Viral", icon: FileText },
         { id: "scenario", label: "🎭 Cenários", icon: Landmark },
         { id: "thumbnail", label: "🖼️ Thumbnail", icon: Image },
+        { id: "pets", label: "🐾 Pets", icon: Cat },
     ];
 
     const handleError = (msg: string) => {
@@ -37,7 +39,7 @@ export default function Home() {
         setTimeout(() => setError(""), 4000);
     };
 
-    const handleGenerate = async (data: InfluencerData | FashionData | POVProductData | InfluencerShowcaseData | ScriptData | ScenarioData | ThumbnailData) => {
+    const handleGenerate = async (data: InfluencerData | FashionData | POVProductData | InfluencerShowcaseData | ScriptData | ScenarioData | ThumbnailData | PetsData) => {
         setIsLoading(true);
         setError("");
         setGeneratedPrompt("");
@@ -215,6 +217,13 @@ export default function Home() {
                                 )}
                                 {activeTab === "thumbnail" && (
                                     <ThumbnailTab
+                                        onGenerate={(data) => handleGenerate(data)}
+                                        isLoading={isLoading}
+                                        onError={handleError}
+                                    />
+                                )}
+                                {activeTab === "pets" && (
+                                    <PetsTab
                                         onGenerate={(data) => handleGenerate(data)}
                                         isLoading={isLoading}
                                         onError={handleError}

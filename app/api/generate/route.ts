@@ -644,6 +644,116 @@ Provide a single detailed prompt optimized for Midjourney/Flux/DALL-E 3 for thum
                 return NextResponse.json({ prompt: response });
             }
 
+            case "pets": {
+                const { petType, breed, action, scenario, personality, petPhoto, details } = data;
+
+                if (!petType || !breed) {
+                    return NextResponse.json(
+                        { error: "Preencha o tipo de pet e a raça/descrição" },
+                        { status: 400 }
+                    );
+                }
+
+                // Add pet photo if provided
+                if (petPhoto) {
+                    imageParts.push(fileToGenerativePart(petPhoto, "image/jpeg"));
+                }
+
+                // Personality-based styling
+                const personalityStyles: Record<string, { mood: string; camera: string; lighting: string }> = {
+                    cute: { mood: "Heartwarming, adorable", camera: "Slightly from above (cute angle)", lighting: "Soft, flattering natural light" },
+                    funny: { mood: "Comedic, meme-worthy", camera: "Unexpected angle or close-up", lighting: "Bright, clear" },
+                    elegant: { mood: "Sophisticated, regal", camera: "Eye level, portrait style", lighting: "Studio lighting, dramatic" },
+                    energetic: { mood: "Dynamic, action-packed", camera: "Fast shutter, motion blur acceptable", lighting: "Bright, vibrant" },
+                    lazy: { mood: "Chill, relaxed vibes", camera: "Wide shot showing comfortable position", lighting: "Warm, cozy afternoon light" },
+                    curious: { mood: "Inquisitive, exploratory", camera: "Close-up on eyes/face", lighting: "Natural, clear" },
+                    dramatic: { mood: "Over-the-top, theatrical", camera: "Low angle for grandeur", lighting: "Cinematic, high contrast" },
+                    sassy: { mood: "Attitude, sass", camera: "Side eye angle", lighting: "Bold, confident" },
+                    majestic: { mood: "Epic, powerful", camera: "Low angle hero shot", lighting: "Golden hour, backlit" },
+                    derpy: { mood: "Goofy, silly", camera: "Weird angle, tongue out", lighting: "Fun, unstaged" }
+                };
+
+                const currentPersonality = personalityStyles[personality] || personalityStyles.cute;
+
+                const petsPrompt = imageParts.length > 0
+                    ? `Analyze this pet photo and create a viral TikTok/Instagram prompt.
+
+**PET SPECS:**
+- Type: ${petType}
+- Breed/Description: ${breed}
+- Action: ${action}
+- Scenario: ${scenario}
+- Personality: ${personality} (${currentPersonality.mood})
+${details ? `- Extra Details: ${details}` : ""}
+
+**REQUIREMENTS:**
+1. Analyze the photo to capture the pet's unique features
+2. ${currentPersonality.camera}
+3. Lighting: ${currentPersonality.lighting}
+4. Focus on cuteness/viral factors (big eyes, fluffy fur, adorable expression)
+5. Natural pet behavior, realistic poses
+6. High-quality photography: Sony A7III, 50mm f/1.8
+
+**OUTPUT:** Detailed prompt for generating this pet in the specified action/scenario, matching the photo's characteristics.`
+                    : `ACT AS A VIRAL PET CONTENT CREATOR.
+
+**OBJECTIVE:** Create a prompt for generating adorable, shareable pet content for TikTok/Instagram.
+
+**PET DETAILS:**
+- Type: ${petType}
+- Breed/Description: ${breed}
+- Action: ${action}
+- Scenario: ${scenario}
+- Personality/Vibe: ${personality}
+${details ? `- Extra Details: ${details}` : ""}
+
+**PROMPT REQUIREMENTS:**
+
+1. **Pet Description:**
+   - Specific breed characteristics (${breed})
+   - Adorable features (big expressive eyes, fluffy fur/feathers, cute nose/mouth)
+   - Natural, healthy appearance
+   - Age-appropriate look (puppy/kitten vs adult)
+
+2. **Action/Pose:**
+   - Engaged in: ${action}
+   - Natural pet behavior (no forced/uncomfortable poses)
+   - Capture the ${personality} personality
+
+3. **Environment:**
+   - Setting: ${scenario}
+   - Background should complement but not distract from pet
+   - Appropriate props if relevant to action
+
+4. **Photography Specs:**
+   - Camera: ${currentPersonality.camera}
+   - Lighting: ${currentPersonality.lighting}
+   - Quality: High-resolution, sharp focus on pet's eyes
+   - Mood: ${currentPersonality.mood}
+   - Sensor: Pet portrait specialist camera (Sony A7 series, 50mm or 85mm lens)
+
+5. **Viral Factors:**
+   - Maximize "aww factor"
+   - Relatable pet moments
+   - Shareable/meme potential
+   - Clear emotional connection
+
+**NEGATIVE PROMPT:**
+Deformed animals, extra limbs, unnatural anatomy, sad/sick appearance, scary, aggressive, poor lighting, blurry, low quality, watermark.
+
+**OUTPUT:**
+Single detailed prompt optimized for Flux/Midjourney/DALL-E 3. Comma-separated format.`;
+
+                const promptToUse = imageParts.length > 0
+                    ? [petsPrompt, ...imageParts]
+                    : petsPrompt;
+
+                const result = await model.generateContent(promptToUse);
+                const response = result.response.text();
+
+                return NextResponse.json({ prompt: response });
+            }
+
             default:
                 return NextResponse.json(
                     { error: "Tipo de tab inválido" },
