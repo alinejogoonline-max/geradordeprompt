@@ -398,3 +398,20 @@ input[type='range']::-moz-range-track {
 .animate-spin-slow {
   animation: spin 8s linear infinite;
 }
+
+/* Fade In Animation for Conditional Fields */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}

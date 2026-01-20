@@ -27,6 +27,7 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
     const [hairColor, setHairColor] = useState("");
     const [eyeColor, setEyeColor] = useState("");
     const [location, setLocation] = useState("random");
+    const [customLocation, setCustomLocation] = useState("");
     const [extraDetails, setExtraDetails] = useState("");
     const [referencePhoto, setReferencePhoto] = useState("");
     const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -46,6 +47,11 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
         if (!ethnicity) return onError("Selecione a etnia do influencer");
         if (!hairColor) return onError("Defina a cor do cabelo");
         if (!eyeColor) return onError("Defina a cor dos olhos");
+        if (location === "custom" && !customLocation.trim()) {
+            return onError("Por favor, descreva o local personalizado");
+        }
+
+        const finalLocation = location === "custom" ? customLocation : location;
 
         onGenerate({
             gender,
@@ -53,7 +59,7 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
             ethnicity,
             hairColor,
             eyeColor,
-            location,
+            location: finalLocation,
             extraDetails,
             referencePhoto: referencePhoto || undefined
         });
@@ -178,9 +184,25 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
                     <option value="hotel">🏨 Hotel Luxuoso</option>
                     <option value="piscina">🏊 Piscina</option>
                     <option value="varanda">🌅 Varanda/Terraço</option>
+                    <option value="custom">✏️ Personalizado (Escrever próprio)</option>
                 </select>
+
+                {/* Custom Location Input - Conditional */}
+                {location === "custom" && (
+                    <div className="mt-3 animate-fadeIn">
+                        <input
+                            type="text"
+                            value={customLocation}
+                            onChange={(e) => setCustomLocation(e.target.value)}
+                            placeholder="Ex: Em uma biblioteca vintage, Na sacada de um penthouse, No topo de uma montanha..."
+                            className="w-full px-5 py-4 bg-white/5 border-2 border-cyan-500/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:bg-white/10 transition-all duration-300 placeholder:text-gray-500 hover:border-cyan-500/70 text-gray-200"
+                            disabled={isLoading}
+                        />
+                    </div>
+                )}
+
                 <p className="text-xs text-gray-500 mt-2">
-                    💡 Escolha onde o modelo/influencer estará na foto gerada
+                    💡 {location === "custom" ? "Descreva o local exato onde deseja que o modelo/influencer apareça" : "Escolha onde o modelo/influencer estará na foto gerada"}
                 </p>
             </div>
 
