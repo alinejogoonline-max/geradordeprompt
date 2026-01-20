@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
         // Handle different tab types
         switch (tabType) {
             case "influencer": {
-                const { gender, age, ethnicity, hairColor, eyeColor, extraDetails, referencePhoto } = data;
+                const { gender, age, ethnicity, hairColor, eyeColor, location, extraDetails, referencePhoto } = data;
 
                 if (!gender || !age || !ethnicity || !hairColor || !eyeColor) {
                     return NextResponse.json(
@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
                 - Ethnicity: ${ethnicity}
                 - Hair: ${hairColor} (CRITICAL: Enforce this strictly. If "Loira" or "Blonde" with Asian ethnicity, FORCE "Dyed Blonde" or "Platinum Blonde")
                 - Eyes: ${eyeColor}
+                - Location/Setting: ${location || "random"} (If "random", choose an appropriate location. Otherwise translate to English, e.g., "cafe" -> "Coffee Shop Interior", "praia" -> "Beach", "casa" -> "Cozy Home Interior")
                 - Extra Details: ${extraDetails || "None"}
                 - Reference Photo Provided: ${referencePhoto ? "Yes" : "No"}
 
@@ -94,10 +95,10 @@ export async function POST(request: NextRequest) {
                         // Add makeup if female, grooming if male
                     },
                     "environment": {
-                        "background": "blurred luxury apartment",
+                        "background": "... (Use the Location/Setting input to determine the background scene. Be specific and descriptive)",
                         "lighting": {
                             "type": "Rembrandt lighting",
-                            "style": "cinematic softbox"
+                            "style": "cinematic softbox (adjust based on location - e.g., natural sunlight for beach, warm interior lights for cafe)"
                         }
                     },
                     "camera": {
