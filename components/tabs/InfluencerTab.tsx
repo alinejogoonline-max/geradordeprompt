@@ -15,6 +15,7 @@ export interface InfluencerData {
     ethnicity: string;
     hairColor: string;
     eyeColor: string;
+    location: string;
     extraDetails: string;
     referencePhoto?: string; // OPCIONAL agora
 }
@@ -25,6 +26,7 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
     const [ethnicity, setEthnicity] = useState("");
     const [hairColor, setHairColor] = useState("");
     const [eyeColor, setEyeColor] = useState("");
+    const [location, setLocation] = useState("random");
     const [extraDetails, setExtraDetails] = useState("");
     const [referencePhoto, setReferencePhoto] = useState("");
     const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -51,6 +53,7 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
             ethnicity,
             hairColor,
             eyeColor,
+            location,
             extraDetails,
             referencePhoto: referencePhoto || undefined
         });
@@ -146,6 +149,39 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
                     className="w-full px-5 py-4 bg-white/5 border-2 border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:bg-white/10 transition-all duration-300 placeholder:text-gray-500 hover:border-white/20"
                     disabled={isLoading}
                 />
+            </div>
+
+            {/* Location/Setting */}
+            <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-300 ml-1 flex items-center gap-2">
+                    📍 Local/Cenário
+                </label>
+                <select
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="w-full px-5 py-4 bg-[#0a0a0f] border-2 border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-500 text-gray-200 appearance-none cursor-pointer hover:border-white/20 transition-all"
+                    disabled={isLoading}
+                >
+                    <option value="random">🎲 Aleatório (Deixe a IA escolher)</option>
+                    <option value="cafe">☕ Café/Coffee Shop</option>
+                    <option value="praia">🏖️ Praia</option>
+                    <option value="casa">🏠 Casa/Quarto</option>
+                    <option value="estudio">🎬 Estúdio Fotográfico</option>
+                    <option value="rua">🌆 Rua/Cidade</option>
+                    <option value="parque">🌳 Parque/Natureza</option>
+                    <option value="academia">💪 Academia</option>
+                    <option value="restaurante">🍽️ Restaurante</option>
+                    <option value="escritorio">💼 Escritório</option>
+                    <option value="shopping">🛍️ Shopping/Loja</option>
+                    <option value="viagem">✈️ Aeroporto/Viagem</option>
+                    <option value="festa">🎉 Festa/Balada</option>
+                    <option value="hotel">🏨 Hotel Luxuoso</option>
+                    <option value="piscina">🏊 Piscina</option>
+                    <option value="varanda">🌅 Varanda/Terraço</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-2">
+                    💡 Escolha onde o modelo/influencer estará na foto gerada
+                </p>
             </div>
 
 
