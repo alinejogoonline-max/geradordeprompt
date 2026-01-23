@@ -68,7 +68,11 @@ export async function POST(request: NextRequest) {
                 1.  **TEXTURE IS KING:** You MUST emphasize skin texture, pores, vellus hair, and natural imperfections.
                 2.  **LIGHTING IMPERFECTION:** Avoid perfect studio lighting. Use terms like "harsh sunlight", "mixed lighting", "flash photography" if appropriate.
                 3.  **BREAK THE AI LOOK:** Avoid "smooth", "perfect", "symmetrical".
-                4.  **Enforce "Extra Details"**: prominently featured in the 'features_description'.
+                5.  **STRUCTURAL VARIETY (CRITICAL):**
+                    - DO NOT GENERATE THE SAME GENERIC FACE.
+                    - RANDOMLY SELECT a specific face shape (Square, Oval, Heart, Diamond, Round).
+                    - RANDOMLY SELECT a specific nose shape (Roman, Button, Nubian, Aquiline, Snub).
+                    - RANDOMLY SELECT specific jawline (Sharp, Soft, Square).
 
                 **JSON STRUCTURE:**
                 {
@@ -95,7 +99,10 @@ export async function POST(request: NextRequest) {
                             "details": ["visible pores", "vellus hair (peach fuzz)", "slight sweat/oil", "sun spots", "natural redness"]
                         },
                         "face": {
-                            "proportions": "natural asymmetry",
+                            "shape": "MUST BE SPECIFIC (e.g. 'sharp diamond face' or 'soft round face')",
+                            "nose": "MUST BE SPECIFIC (e.g. 'prominent aquiline nose' or 'small button nose')",
+                            "lips": "MUST BE SPECIFIC (e.g. 'full cupids bow' or 'thin expressive lips')",
+                            "proportions": "natural asymmetry (one eye slightly smaller/lower)",
                             "expression": "candid, non-posed look"
                         },
                         // Add makeup if female, grooming if male (but keep it realistic, e.g. "mascara clumps" or "stubble")
@@ -240,7 +247,10 @@ Output ONLY the technical description. No intro.`;
                         const skinDetails = subject.skin_texture?.details?.join(", ") || "visible pores, vellus hair, textured skin";
                         const features = subject.features_description || "unique features";
 
-                        influencerDesc = `(${subject.gender}, ${subject.age}y, ${subject.ethnicity}, ${features}. Hair: ${subject.hair.color} ${subject.hair.style}. Skin: ${skinDetails}).`;
+                        // Extract structural details for variety
+                        const faceStruct = subject.face ? `, ${subject.face.shape}, ${subject.face.nose}, ${subject.face.lips}` : "";
+
+                        influencerDesc = `(${subject.gender}, ${subject.age}y, ${subject.ethnicity}, ${features}${faceStruct}. Hair: ${subject.hair.color} ${subject.hair.style}. Skin: ${skinDetails}).`;
                         hasInfluencer = true;
                     } catch (e) {
                         console.log("Invalid influencer JSON");
@@ -474,7 +484,10 @@ Output a comma-separated description focusing on:
                         // Extract realism details
                         const skinDetails = subject.skin_texture?.details?.join(", ") || "visible pores, vellus hair";
 
-                        influencerDesc = `(${subject.gender}, ${subject.age}y, ${subject.ethnicity}, ${subject.features_description}. Skin: ${skinDetails})`;
+                        // Structural variety
+                        const faceStruct = subject.face ? `, ${subject.face.shape}, ${subject.face.nose}, ${subject.face.lips}` : "";
+
+                        influencerDesc = `(${subject.gender}, ${subject.age}y, ${subject.ethnicity}, ${subject.features_description}${faceStruct}. Skin: ${skinDetails})`;
                         hasInfluencer = true;
                     } catch (e) {
                         console.log("Invalid JSON");
