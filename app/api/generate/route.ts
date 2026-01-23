@@ -544,9 +544,10 @@ ${audioScript}
 - No hand clipping.
 - Accurate product scale.`;
                     }
-
-                    return NextResponse.json({ prompt: finalPrompt });
                 }
+
+                return NextResponse.json({ prompt: finalPrompt });
+            }
 
             case "scenario": {
                 const { environmentType, visualStyle, lighting, details } = data;
