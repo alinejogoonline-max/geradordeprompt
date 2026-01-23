@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
                 **STRATEGY:**
                 1. Break strict stereotypes if inputs conflict (e.g. Japanese + Blue Eyes = Colored Contacts/Anime style or Rare genetics).
-                2. Ensure "Extra Details" are prominently featured in the `features_description`.
+                2. Ensure "Extra Details" are prominently featured in the 'features_description'.
                 3. Create a consistency-ready output.
 
                 **JSON STRUCTURE:**
@@ -202,7 +202,7 @@ export async function POST(request: NextRequest) {
             }
 
             case "fashion": {
-                const { image, mediaType, influencerJSON, customScript, tone } = data;
+                const { image, mediaType, influencerJSON, customScript, tone, duration } = data;
 
                 if (!image) {
                     return NextResponse.json(
@@ -328,7 +328,7 @@ Morphing, melting hands, text glitches, extra fingers, cartoon, drawing, paintin
             }
 
             case "pov": {
-                const { image: productImage, mediaType, customScript, tone } = data;
+                const { image: productImage, mediaType, customScript, tone, duration } = data;
 
                 if (!productImage) {
                     return NextResponse.json(
@@ -385,7 +385,28 @@ First-person view (POV) of a hand holding: ${productDescription}.
 - Background: High quality gaussian blur (Bokeh). Focus solely on product.
 - Lens: 105mm Macro f/2.8.`;
                 } else {
-                    finalPrompt = `**VIDEO PROMPT (POV UNBOXING - FLOW/KLING)**
+                    const totalDuration = parseInt(duration || "8");
+                    const clips = Math.ceil(totalDuration / 8);
+
+                    if (clips > 1) {
+                        finalPrompt = `ACT AS A VIDEO DIRECTOR.
+**OBJECTIVE:** Create ${clips} sequential POV prompts for a ${totalDuration}s unboxing video.
+
+**PRODUCT:** ${productDescription}
+
+**OUTPUT FORMAT:**
+"Prompt 1 --- Prompt 2 --- Prompt 3"
+
+**SEQUENCE:**
+Clip 1 (0-8s): POV holding the product, slowly rotating it.
+Clip 2 (8-16s): POV showing the texture/opening the product.
+Clip 3+ (16s+): POV applying/using the product.
+
+**MANDATORY:**
+- Maintain POV consistency.
+- Product details must remain constant.`;
+                    } else {
+                        finalPrompt = `**VIDEO PROMPT (POV UNBOXING - FLOW/KLING)**
 
 **SCENE:**
 First-person view (POV). A realistic hand holding: ${productDescription}.
@@ -406,13 +427,13 @@ NO morphing labels. NO melting fingers. The product must remain solid rigid obje
 
 **NEGATIVE PROMPT:**
 Morphing, melting hands, text glitches, extra fingers, cartoon, drawing, painting, bad physics, low resolution, blurry.`;
+                    }
+
+                    return NextResponse.json({ prompt: finalPrompt });
                 }
 
-                return NextResponse.json({ prompt: finalPrompt });
-            }
-
             case "showcase": {
-                const { productImage, mediaType, influencerJSON, customScript, tone } = data;
+                const { productImage, mediaType, influencerJSON, customScript, tone, duration } = data;
 
                 if (!productImage) {
                     return NextResponse.json(
@@ -477,7 +498,30 @@ Holding product: ${productDesc}.
 - Camera: Canon R5, 85mm f/1.2 Portrait Lens.
 - Quality: Magazine retouching, sharp eyes, readable product label.`;
                 } else {
-                    finalPrompt = `**VIDEO PROMPT (PRODUCT TESTIMONIAL)**
+                    const totalDuration = parseInt(duration || "8");
+                    const clips = Math.ceil(totalDuration / 8);
+
+                    if (clips > 1) {
+                        finalPrompt = `ACT AS A VIDEO DIRECTOR.
+**OBJECTIVE:** Create ${clips} sequential prompts for a ${totalDuration}s product showcase.
+
+**CONTEXT:**
+- Influencer: ${hasInfluencer ? influencerDesc : "Model"}
+- Product: ${productDesc}
+
+**OUTPUT FORMAT:**
+"Prompt 1 --- Prompt 2 --- Prompt 3"
+
+**SEQUENCE:**
+Clip 1 (0-8s): Influencer holding product near face, smiling.
+Clip 2 (8-16s): Close up on product texture/application.
+Clip 3+ (16s+): Influencer reaction/result.
+
+**MANDATORY:**
+- Influencer face consistency.
+- Product label consistency.`;
+                    } else {
+                        finalPrompt = `**VIDEO PROMPT (PRODUCT TESTIMONIAL)**
 
 **CHARACTER:**
 ${hasInfluencer ? `**INFLUENCER (STRICT):** ${influencerDesc}` : "Professional Influencer"} reviewing a product.
@@ -498,10 +542,10 @@ ${audioScript}
 - 4k Resolution.
 - No hand clipping.
 - Accurate product scale.`;
-                }
+                    }
 
-                return NextResponse.json({ prompt: finalPrompt });
-            }
+                    return NextResponse.json({ prompt: finalPrompt });
+                }
 
             case "scenario": {
                 const { environmentType, visualStyle, lighting, details } = data;

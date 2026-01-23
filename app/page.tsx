@@ -90,11 +90,11 @@ export default function Home() {
         }
     };
 
-    const scripts = activeTab === "script" && generatedPrompt
+    const multiPrompts = generatedPrompt
         ? generatedPrompt.split("---").map(s => s.trim()).filter(s => s.length > 0)
         : [];
 
-    const isScriptTab = activeTab === "script";
+    const showMultiPrompts = multiPrompts.length > 1;
 
     return (
         <main className="aurora-bg min-h-screen flex items-center justify-center p-4 relative overflow-hidden text-balance">
@@ -276,7 +276,7 @@ export default function Home() {
 
                     {/* Generated Prompt Area */}
                     <AnimatePresence>
-                        {generatedPrompt && !isLoading && !isScriptTab && (
+                        {generatedPrompt && !isLoading && !showMultiPrompts && (
                             <motion.div
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
@@ -313,13 +313,13 @@ export default function Home() {
 
                     {/* Scripts Display */}
                     <AnimatePresence>
-                        {generatedPrompt && !isLoading && isScriptTab && (
+                        {generatedPrompt && !isLoading && showMultiPrompts && (
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6"
                             >
-                                {scripts.map((script, index) => (
+                                {multiPrompts.map((prompt, index) => (
                                     <motion.div
                                         key={index}
                                         initial={{ opacity: 0, y: 20 }}
@@ -330,16 +330,18 @@ export default function Home() {
                                         <div className="absolute inset-0 bg-gradient-to-b from-accent-cyan/20 to-accent-purple/20 rounded-2xl blur-sm opacity-0 group-hover:opacity-100 transition duration-500" />
                                         <div className="relative h-full bg-[#0a0a0f]/80 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col gap-4 hover:border-accent-purple/50 transition-colors">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-xs font-bold text-accent-cyan tracking-wider uppercase">Opção 0{index + 1}</span>
+                                                <span className="text-xs font-bold text-accent-cyan tracking-wider uppercase">
+                                                    {activeTab === 'script' ? `Opção 0${index + 1}` : `Clip 0${index + 1}`}
+                                                </span>
                                                 <button
-                                                    onClick={() => handleCopyScript(script, index)}
+                                                    onClick={() => handleCopyScript(prompt, index)}
                                                     className="p-2 hover:bg-white/5 rounded-full transition-colors"
                                                 >
                                                     {copiedScriptIndex === index ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-400" />}
                                                 </button>
                                             </div>
                                             <p className="text-sm text-gray-300 leading-relaxed font-medium">
-                                                "{script}"
+                                                "{prompt}"
                                             </p>
                                         </div>
                                     </motion.div>

@@ -16,6 +16,7 @@ export interface POVProductData {
     mediaType: "photo" | "video";
     customScript?: string; // OPCIONAL
     tone?: string;
+    duration?: string;
 }
 
 export default function POVProductTab({ onGenerate, isLoading, onError }: POVProductTabProps) {
@@ -24,6 +25,7 @@ export default function POVProductTab({ onGenerate, isLoading, onError }: POVPro
     const [mediaType, setMediaType] = useState<"photo" | "video">("photo");
     const [customScript, setCustomScript] = useState("");
     const [tone, setTone] = useState("energetic");
+    const [duration, setDuration] = useState("8");
 
     const handleImageSelect = (file: File, preview: string) => {
         setImageFile(file);
@@ -45,7 +47,8 @@ export default function POVProductTab({ onGenerate, isLoading, onError }: POVPro
             imageFile,
             mediaType,
             customScript: customScript || undefined,
-            tone
+            tone,
+            duration: mediaType === "video" ? duration : undefined
         });
     };
 
@@ -89,6 +92,29 @@ export default function POVProductTab({ onGenerate, isLoading, onError }: POVPro
                         <span>VÍDEO</span>
                     </button>
                 </div>
+
+                {/* Video Duration Selector */}
+                <div className={`overflow-hidden transition-all duration-500 ease-in-out ${mediaType === 'video' ? 'max-h-24 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+                    <label className="block text-sm font-semibold mb-3 text-gray-100 flex items-center gap-2">
+                        <span className="text-cyan-400">⏱️</span> Duração do Vídeo (Veo 3 Adaptation)
+                    </label>
+                    <div className="flex gap-2">
+                        {["8", "16", "24", "32"].map((sec) => (
+                            <button
+                                key={sec}
+                                type="button"
+                                onClick={() => setDuration(sec)}
+                                className={`flex-1 py-3 rounded-xl text-sm font-bold border transition-all ${duration === sec
+                                    ? "bg-cyan-500/20 border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                                    : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                                    }`}
+                            >
+                                {sec}s
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 <p className="text-xs text-gray-500 mt-2">
                     {mediaType === "photo"
                         ? "💡 Gerará um prompt para foto macro (Product Shot POV)"

@@ -17,12 +17,14 @@ export interface InfluencerShowcaseData {
     influencerJSON?: string; // OPCIONAL
     customScript?: string; // OPCIONAL
     tone?: string;
+    duration?: string;
 }
 
 export default function InfluencerShowcaseTab({ onGenerate, isLoading, onError }: InfluencerShowcaseTabProps) {
     const [productImage, setProductImage] = useState("");
     const [productFile, setProductFile] = useState<File | null>(null);
     const [mediaType, setMediaType] = useState<"photo" | "video">("photo");
+    const [duration, setDuration] = useState("8");
     const [influencerJSON, setInfluencerJSON] = useState("");
     const [customScript, setCustomScript] = useState("");
     const [tone, setTone] = useState("energetic");
@@ -48,7 +50,8 @@ export default function InfluencerShowcaseTab({ onGenerate, isLoading, onError }
             mediaType,
             influencerJSON: influencerJSON || undefined,
             customScript: customScript || undefined,
-            tone
+            tone,
+            duration: mediaType === "video" ? duration : undefined
         });
     };
 
@@ -151,6 +154,29 @@ export default function InfluencerShowcaseTab({ onGenerate, isLoading, onError }
                         <span>VÍDEO</span>
                     </button>
                 </div>
+
+                {/* Video Duration Selector */}
+                <div className={`overflow-hidden transition-all duration-500 ease-in-out ${mediaType === 'video' ? 'max-h-24 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+                    <label className="block text-sm font-semibold mb-3 text-gray-100 flex items-center gap-2">
+                        <span className="text-accent-pink">⏱️</span> Duração do Vídeo (Veo 3 Adaptation)
+                    </label>
+                    <div className="flex gap-2">
+                        {["8", "16", "24", "32"].map((sec) => (
+                            <button
+                                key={sec}
+                                type="button"
+                                onClick={() => setDuration(sec)}
+                                className={`flex-1 py-3 rounded-xl text-sm font-bold border transition-all ${duration === sec
+                                    ? "bg-accent-pink/20 border-accent-pink text-accent-pink shadow-[0_0_15px_rgba(236,72,153,0.3)]"
+                                    : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                                    }`}
+                            >
+                                {sec}s
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 <p className="text-xs text-gray-500 mt-2">
                     {mediaType === "photo"
                         ? "💡 Influencer segurando produto (Portrait Testimonial)"
