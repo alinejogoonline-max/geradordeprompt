@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ImageUpload from "../ImageUpload";
+import MultiImageUpload from "../MultiImageUpload";
 import { Camera, Video } from "lucide-react";
 
 interface InfluencerShowcaseTabProps {
@@ -11,8 +11,8 @@ interface InfluencerShowcaseTabProps {
 }
 
 export interface InfluencerShowcaseData {
-    productImage: string;
-    productFile: File;
+    productImages: string[];
+    productFiles: File[];
     mediaType: "photo" | "video";
     influencerJSON?: string; // OPCIONAL
     customScript?: string; // OPCIONAL
@@ -21,32 +21,27 @@ export interface InfluencerShowcaseData {
 }
 
 export default function InfluencerShowcaseTab({ onGenerate, isLoading, onError }: InfluencerShowcaseTabProps) {
-    const [productImage, setProductImage] = useState("");
-    const [productFile, setProductFile] = useState<File | null>(null);
+    const [productImages, setProductImages] = useState<string[]>([]);
+    const [productFiles, setProductFiles] = useState<File[]>([]);
     const [mediaType, setMediaType] = useState<"photo" | "video">("photo");
     const [duration, setDuration] = useState("8");
     const [influencerJSON, setInfluencerJSON] = useState("");
     const [customScript, setCustomScript] = useState("");
     const [tone, setTone] = useState("energetic");
 
-    const handleImageSelect = (file: File, preview: string) => {
-        setProductFile(file);
-        setProductImage(preview);
-    };
-
-    const handleImageRemove = () => {
-        setProductImage("");
-        setProductFile(null);
+    const handleImagesChange = (files: File[], previews: string[]) => {
+        setProductFiles(files);
+        setProductImages(previews);
     };
 
     const handleSubmit = () => {
-        if (!productImage || !productFile) {
-            return onError("Faça o upload da foto do produto para continuar");
+        if (productImages.length === 0 || productFiles.length === 0) {
+            return onError("Faça o upload de pelo menos uma foto do produto para continuar");
         }
 
         onGenerate({
-            productImage,
-            productFile,
+            productImages,
+            productFiles,
             mediaType,
             influencerJSON: influencerJSON || undefined,
             customScript: customScript || undefined,
@@ -57,11 +52,11 @@ export default function InfluencerShowcaseTab({ onGenerate, isLoading, onError }
 
     return (
         <div className="space-y-6">
-            <ImageUpload
-                onImageSelect={handleImageSelect}
-                onImageRemove={handleImageRemove}
-                currentImage={productImage}
-                label="Upload do Produto"
+            <MultiImageUpload
+                onImagesChange={handleImagesChange}
+                currentImages={productImages}
+                maxImages={5}
+                label="Upload do Produto (Múltiplas Fotos)"
             />
 
             {/* Influencer JSON Field - OPCIONAL */}

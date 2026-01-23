@@ -453,24 +453,48 @@ Morphing, melting hands, text glitches, extra fingers, cartoon, drawing, paintin
             }
 
             case "showcase": {
-                const { productImage, mediaType, influencerJSON, customScript, tone, duration } = data;
+                const { productImages, mediaType, influencerJSON, customScript, tone, duration } = data;
 
-                if (!productImage) {
+                // Support both old single image format and new multiple images format
+                const images = productImages || (data.productImage ? [data.productImage] : []);
+
+                if (!images || images.length === 0) {
                     return NextResponse.json(
-                        { error: "Faça o upload do produto" },
+                        { error: "Faça o upload de pelo menos uma foto do produto" },
                         { status: 400 }
                     );
                 }
 
-                // Add product image for Gemini Vision
-                imageParts.push(fileToGenerativePart(productImage, "image/jpeg"));
+                // Add all product images for Gemini Vision
+                images.forEach((image: string) => {
+                    imageParts.push(fileToGenerativePart(image, "image/jpeg"));
+                });
 
-                const productPrompt = `Analyze this product image.
-Output a comma-separated description focusing on:
-1. PRODUCT TYPE (Bottle, Box, Jar, Device)
-2. BRAND COLORS (Exact hex vibes)
-3. MATERIAL (Matte plastic, clear glass, metallic)
-4. LABEL TEXT (What is written on it?)`;
+                const imageCount = images.length;
+                const multiImageNote = imageCount > 1
+                    ? `You are viewing ${imageCount} images of the SAME product from different angles/views.`
+                    : "You are viewing 1 image of this product.";
+
+                const productPrompt = `ACT AS A FORENSIC PRODUCT ANALYST.
+
+${multiImageNote}
+
+**CRITICAL MISSION:** ${imageCount > 1 ? 'Analyze ALL images together and create ONE comprehensive description combining all views.' : 'Describe this EXACT product with 100% VISUAL FIDELITY.'}
+
+**MANDATORY RULES:**
+1. **ZERO INTERPRETATION:** Describe ONLY what you see. Do NOT invent, assume, or create variations.
+2. **EXACT TEXT TRANSCRIPTION:** Copy ALL visible text/logos EXACTLY as written (letter-by-letter).
+3. **PRECISE COLOR MATCHING:** Describe exact colors you see (e.g., "Deep navy blue with gold accents").
+4. **ACCURATE SHAPE/FORM:** Describe the exact shape, size proportions, and physical structure.
+${imageCount > 1 ? '5. **COMBINE ALL VIEWS:** Extract information from ALL images. Note different angles (front, back, side, detail shots) if visible.' : ''}
+
+**OUTPUT FORMAT (Comma-separated, dense description):**
+"[EXACT PRODUCT TYPE], [EXACT BRAND NAME if visible], [PRECISE COLORS], [MATERIAL TYPE], [SHAPE/FORM FACTOR], [ALL VISIBLE TEXT/LABELS from any image], [DISTINCTIVE FEATURES]"
+
+**EXAMPLE:**
+"Cylindrical glass bottle, transparent with rose gold metallic cap, 'LUXE SERUM' written in serif font on white label, 30ml dropper bottle, minimalist design"
+
+**CRITICAL:** This description will be used for AI image generation. Any deviation from the actual product will create the WRONG product. BE LITERAL.`;
                 const productResult = await model.generateContent([productPrompt, ...imageParts]);
                 const productDesc = productResult.response.text();
 
@@ -508,22 +532,36 @@ Output a comma-separated description focusing on:
                 const audioScript = customScript ? `"${customScript}"` : `(Write a ${currentTone.audio} reaction in PT-BR)`;
 
                 if (mediaType === "photo") {
+                    const multiImageNote = imageCount > 1
+                        ? `\n\n**REFERENCE IMAGES:** This description was created by analyzing ${imageCount} different views/angles of the same product.`
+                        : "";
+
                     finalPrompt = `**BEAUTY/LIFESTYLE PORTRAIT (PRODUCT HERO)**
 
 **SUBJECT (MANDATORY):**
 ${hasInfluencer ? `**INFLUENCER (STRICT):** ${influencerDesc}` : "A stunning HIGH-FASHION model"}
-Holding product: ${productDesc}.
+Holding product: ${productDesc}.${multiImageNote}
+
+**PRODUCT FIDELITY RULES (CRITICAL):**
+- The product MUST match this description EXACTLY: ${productDesc}
+- ALL visible text/logos on the product must be IDENTICAL to the description
+- Product colors, shape, and materials must be PRECISE
+- NO creative variations or "similar" products allowed
+- If brand name is mentioned, it MUST appear correctly
 
 **POSE & COMPOSITION:**
 - Product Placement: Held next to face/cheek (Beauty Youtuber Thumbnail style).
-- **LABEL VISIBILITY:** 100% visible to camera, sharp text, no glare.
+- **LABEL VISIBILITY:** 100% visible to camera, sharp text, no glare, no distortion.
 - Expression: ${currentTone.expression}.
 
 **AESTHETIC:**
 - Lighting: Ring Light + Softbox (E-commerce standard).
 - Mood: ${currentTone.mood}.
 - Camera: Canon R5, 85mm f/1.2 Portrait Lens.
-- Quality: Magazine retouching, sharp eyes, readable product label.`;
+- Quality: Magazine retouching, sharp eyes, readable product label.
+
+**NEGATIVE PROMPT:**
+Wrong product, different packaging, altered text, modified colors, generic product, placeholder product, incorrect branding.`;
                 } else {
                     const totalDuration = parseInt(duration || "8");
                     const clips = Math.ceil(totalDuration / 8);
@@ -536,6 +574,12 @@ Holding product: ${productDesc}.
 - Influencer: ${hasInfluencer ? influencerDesc : "Model"}
 - Product: ${productDesc}
 
+**CRITICAL PRODUCT FIDELITY RULES:**
+- The product MUST be: ${productDesc}
+- This EXACT product must appear consistently in ALL clips
+- NO variations in branding, colors, or text between clips
+- Product must remain visually identical throughout the entire sequence
+
 **OUTPUT FORMAT:**
 "Prompt 1 --- Prompt 2 --- Prompt 3"
 
@@ -546,12 +590,19 @@ Clip 3+ (16s+): Influencer reaction/result.
 
 **MANDATORY:**
 - Influencer face consistency.
-- Product label consistency.`;
+- Product label consistency (CRITICAL - must be identical in all clips).`;
                     } else {
                         finalPrompt = `**VIDEO PROMPT (PRODUCT TESTIMONIAL)**
 
 **CHARACTER:**
 ${hasInfluencer ? `**INFLUENCER (STRICT):** ${influencerDesc}` : "Professional Influencer"} reviewing a product.
+
+**PRODUCT (MANDATORY FIDELITY):**
+The product being shown is: ${productDesc}
+- This EXACT product must appear in every frame
+- ALL text/logos must match the description precisely
+- Colors, shape, and branding must be IDENTICAL
+- NO substitutions or "similar" products
 
 **ACTION KEYFRAMES:**
 1. Influencer defines ${currentTone.expression}.
@@ -568,7 +619,11 @@ ${audioScript}
 **TECH SPECS:**
 - 4k Resolution.
 - No hand clipping.
-- Accurate product scale.`;
+- Accurate product scale.
+- Product must remain visually consistent throughout.
+
+**NEGATIVE PROMPT:**
+Wrong product, morphing packaging, changing text, color shifts, generic product, placeholder branding.`;
                     }
                 }
 
