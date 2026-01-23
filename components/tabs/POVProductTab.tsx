@@ -55,7 +55,7 @@ export default function POVProductTab({ onGenerate, isLoading, onError }: POVPro
                 onImageSelect={handleImageSelect}
                 onImageRemove={handleImageRemove}
                 currentImage={image}
-                label="Upload do Produto 📦"
+                label="Upload do Produto"
             />
 
             {/* Media Type Toggle */}
@@ -74,7 +74,7 @@ export default function POVProductTab({ onGenerate, isLoading, onError }: POVPro
                             }`}
                     >
                         <Camera className="w-5 h-5" />
-                        <span>📸 FOTO</span>
+                        <span>FOTO</span>
                     </button>
                     <button
                         type="button"
@@ -86,7 +86,7 @@ export default function POVProductTab({ onGenerate, isLoading, onError }: POVPro
                             }`}
                     >
                         <Video className="w-5 h-5" />
-                        <span>🎥 VÍDEO</span>
+                        <span>VÍDEO</span>
                     </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
@@ -140,7 +140,7 @@ export default function POVProductTab({ onGenerate, isLoading, onError }: POVPro
                 disabled={isLoading}
                 className="btn-liquid w-full py-5 rounded-2xl text-white font-bold text-lg tracking-wide shadow-lg hover:shadow-accent-cyan/50 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
-                {isLoading ? "Analisando com Gemini Vision..." : `✨ Gerar Prompt de ${mediaType === "photo" ? "Foto" : "Vídeo"}`}
+                {isLoading ? "Analisando com Gemini Vision..." : `Gerar Prompt de ${mediaType === "photo" ? "Foto" : "Vídeo"}`}
             </button>
         </div>
     );

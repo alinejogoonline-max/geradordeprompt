@@ -86,7 +86,7 @@ export default function ScriptTab({ onGenerate, isLoading, onError }: ScriptTabP
                 disabled={isLoading}
                 className="btn-liquid w-full py-5 rounded-2xl text-white font-bold text-lg tracking-wide shadow-lg hover:shadow-accent-purple/50 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
-                {isLoading ? "Gerando hooks virais..." : "🔥 Gerar 3 Roteiros Virais"}
+                {isLoading ? "Gerando hooks virais..." : "Gerar 3 Roteiros Virais"}
             </button>
         </div>
     );

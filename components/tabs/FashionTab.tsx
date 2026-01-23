@@ -58,7 +58,7 @@ export default function FashionTab({ onGenerate, isLoading, onError }: FashionTa
                 onImageSelect={handleImageSelect}
                 onImageRemove={handleImageRemove}
                 currentImage={image}
-                label="Upload da Roupa/Look 👗"
+                label="Upload da Roupa/Look"
             />
 
             {/* Influencer JSON Field - OPCIONAL */}
@@ -130,7 +130,7 @@ export default function FashionTab({ onGenerate, isLoading, onError }: FashionTa
                             }`}
                     >
                         <Camera className="w-5 h-5" />
-                        <span>📸 FOTO</span>
+                        <span>FOTO</span>
                     </button>
                     <button
                         type="button"
@@ -142,7 +142,7 @@ export default function FashionTab({ onGenerate, isLoading, onError }: FashionTa
                             }`}
                     >
                         <Video className="w-5 h-5" />
-                        <span>🎥 VÍDEO</span>
+                        <span>VÍDEO</span>
                     </button>
                 </div>
             </div>
@@ -152,7 +152,7 @@ export default function FashionTab({ onGenerate, isLoading, onError }: FashionTa
                 disabled={isLoading}
                 className="btn-liquid w-full py-5 rounded-2xl text-white font-bold text-lg tracking-wide shadow-lg hover:shadow-accent-purple/50 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
-                {isLoading ? "Analisando com Gemini Vision..." : `✨ Gerar Prompt de ${mediaType === "photo" ? "Foto" : "Vídeo"}`}
+                {isLoading ? "Analisando com Gemini Vision..." : `Gerar Prompt de ${mediaType === "photo" ? "Foto" : "Vídeo"}`}
             </button>
         </div>
     );

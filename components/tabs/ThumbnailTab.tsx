@@ -46,7 +46,7 @@ export default function ThumbnailTab({ onGenerate, isLoading, onError }: Thumbna
         onGenerate({
             expression,
             contentType,
-            thumbnailText,
+            thumbnailText: thumbnailText.trim(),
             influencerJSON: useInfluencer ? influencerJSON : undefined,
             referenceImage: referenceImage || undefined
         });
@@ -60,7 +60,7 @@ export default function ThumbnailTab({ onGenerate, isLoading, onError }: Thumbna
                     onImageSelect={handleImageSelect}
                     onImageRemove={handleImageRemove}
                     currentImage={referenceImage}
-                    label="Referência de Expressão (opcional) 📸"
+                    label="Referência de Expressão (opcional)"
                 />
                 <p className="text-xs text-gray-500 mt-2">
                     💡 Upload de uma foto mostrando a expressão que você quer replicar
@@ -70,7 +70,7 @@ export default function ThumbnailTab({ onGenerate, isLoading, onError }: Thumbna
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Expression/Emotion */}
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-300 ml-1">😲 Expressão/Emoção</label>
+                    <label className="text-sm font-semibold text-gray-300 ml-1">Expressão/Emoção</label>
                     <select
                         value={expression}
                         onChange={(e) => setExpression(e.target.value)}
@@ -93,7 +93,7 @@ export default function ThumbnailTab({ onGenerate, isLoading, onError }: Thumbna
 
                 {/* Content Type */}
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-300 ml-1">🎬 Tipo de Conteúdo</label>
+                    <label className="text-sm font-semibold text-gray-300 ml-1">Tipo de Conteúdo</label>
                     <select
                         value={contentType}
                         onChange={(e) => setContentType(e.target.value)}
@@ -115,7 +115,7 @@ export default function ThumbnailTab({ onGenerate, isLoading, onError }: Thumbna
             {/* Thumbnail Text */}
             <div className="space-y-2">
                 <label className="text-sm font-semibold text-gray-300 ml-1">
-                    ✍️ Texto da Thumbnail <span className="text-pink-400">*</span>
+                    Texto da Thumbnail <span className="text-pink-400">*</span>
                 </label>
                 <input
                     type="text"
@@ -142,7 +142,7 @@ export default function ThumbnailTab({ onGenerate, isLoading, onError }: Thumbna
                         disabled={isLoading}
                     />
                     <span className="text-sm font-semibold text-gray-300 group-hover:text-pink-400 transition-colors">
-                        📄 Usar JSON do Influencer da Aba 1
+                        Usar JSON do Influencer da Aba 1
                     </span>
                 </label>
 
@@ -168,7 +168,7 @@ export default function ThumbnailTab({ onGenerate, isLoading, onError }: Thumbna
                 disabled={isLoading || !expression || !thumbnailText.trim()}
                 className="group relative w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-5 rounded-2xl transition-all transform hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] disabled:scale-100 shadow-xl hover:shadow-2xl hover:shadow-pink-500/50 overflow-hidden disabled:cursor-not-allowed"
             >
-                {isLoading ? "Gerando Thumbnail..." : "🖼️ Gerar Prompt de Thumbnail"}
+                {isLoading ? "Gerando Thumbnail..." : "Gerar Prompt de Thumbnail"}
             </button>
         </div>
     );

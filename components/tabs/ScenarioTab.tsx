@@ -43,7 +43,7 @@ export default function ScenarioTab({ onGenerate, isLoading, onError }: Scenario
             {/* Environment Type */}
             <div className="space-y-2">
                 <label className="text-sm font-semibold text-gray-300 ml-1 flex items-center gap-2">
-                    🏛️ Tipo de Ambiente
+                    Tipo de Ambiente
                 </label>
                 <select
                     value={environmentType}
@@ -89,7 +89,7 @@ export default function ScenarioTab({ onGenerate, isLoading, onError }: Scenario
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Visual Style */}
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-300 ml-1">🎨 Estilo Visual</label>
+                    <label className="text-sm font-semibold text-gray-300 ml-1">Estilo Visual</label>
                     <select
                         value={visualStyle}
                         onChange={(e) => setVisualStyle(e.target.value)}
@@ -109,7 +109,7 @@ export default function ScenarioTab({ onGenerate, isLoading, onError }: Scenario
 
                 {/* Lighting */}
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-300 ml-1">💡 Iluminação</label>
+                    <label className="text-sm font-semibold text-gray-300 ml-1">Iluminação</label>
                     <select
                         value={lighting}
                         onChange={(e) => setLighting(e.target.value)}
@@ -153,7 +153,7 @@ export default function ScenarioTab({ onGenerate, isLoading, onError }: Scenario
                 disabled={isLoading || !environmentType}
                 className="group relative w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-5 rounded-2xl transition-all transform hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] disabled:scale-100 shadow-xl hover:shadow-2xl hover:shadow-purple-500/50 overflow-hidden disabled:cursor-not-allowed"
             >
-                {isLoading ? "Gerando Prompt..." : "🎭 Gerar Prompt de Cenário"}
+                {isLoading ? "Gerando Prompt..." : "Gerar Prompt de Cenário"}
             </button>
         </div>
     );

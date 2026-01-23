@@ -29,9 +29,9 @@ export default function Home() {
         { id: "pov", label: "POV Produto", icon: Hand },
         { id: "showcase", label: "Influencer + Produto", icon: Star },
         { id: "script", label: "Roteiro Viral", icon: FileText },
-        { id: "scenario", label: "🎭 Cenários", icon: Landmark },
-        { id: "thumbnail", label: "🖼️ Thumbnail", icon: Image },
-        { id: "pets", label: "🐾 Pets", icon: Cat },
+        { id: "scenario", label: "Cenários", icon: Landmark },
+        { id: "thumbnail", label: "Thumbnail", icon: Image },
+        { id: "pets", label: "Pets", icon: Cat },
     ];
 
     const handleError = (msg: string) => {

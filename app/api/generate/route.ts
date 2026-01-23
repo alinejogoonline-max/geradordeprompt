@@ -50,19 +50,24 @@ export async function POST(request: NextRequest) {
                 ACT AS A WORLD-CLASS AI PROMPT ENGINEER.
                 Create a high-fidelity JSON profile for an influencer.
 
-                **INPUT DATA:**
-                - Gender: ${gender}
-                - Age: ${age}
-                - Ethnicity: ${ethnicity}
-                - Hair: ${hairColor} (CRITICAL: Enforce this strictly. If "Loira" or "Blonde" with Asian ethnicity, FORCE "Dyed Blonde" or "Platinum Blonde")
-                - Eyes: ${eyeColor}
-                - Location/Setting: ${location || "random"} (If "random", choose an appropriate location. Otherwise translate to English, e.g., "cafe" -> "Coffee Shop Interior", "praia" -> "Beach", "casa" -> "Cozy Home Interior")
-                - Extra Details: ${extraDetails || "None"}
-                - Reference Photo Provided: ${referencePhoto ? "Yes" : "No"}
+                **MANDATORY CONSTRAINTS:**
+                - Gender: "${gender}" (MUST be respected)
+                - Age: "${age}" (Visual age approximation)
+                - Ethnicity: "${ethnicity}" (STRICT ADHERENCE REQUIRED)
+                - Hair: "${hairColor}" (OVERRIDE ANY ETHNICITY STEREOTYPES. E.g. If Asian + Blonde, generate Asian with Blonde hair.)
+                - Eyes: "${eyeColor}"
+                - Location: "${location || "random"}"
+                - Details: "${extraDetails || "None"}"
+                - Reference Photo: ${referencePhoto ? "Yes - Extract features from image" : "No - Use description only"}
 
                 **TASK:**
-                Generate a JSON object compatible with Flux/Midjourney logic.
-                Translate all Portuguese inputs to English specifically for image generation (e.g., "Morena" -> "Brown Hair", "Loira" -> "Blonde").
+                Generate a high-fidelity JSON object for image generation.
+                translate ALL Portuguese terms to English visual descriptors.
+
+                **STRATEGY:**
+                1. Break strict stereotypes if inputs conflict (e.g. Japanese + Blue Eyes = Colored Contacts/Anime style or Rare genetics).
+                2. Ensure "Extra Details" are prominently featured in the `features_description`.
+                3. Create a consistency-ready output.
 
                 **JSON STRUCTURE:**
                 {
@@ -156,39 +161,39 @@ export async function POST(request: NextRequest) {
 
                 const selectedTone = toneInstructions[tone || "energetic"];
 
-                const scriptPrompt = `ACT AS A WORLD-CLASS TIKTOK SCRIPTWRITER.
+                const scriptPrompt = `ACT AS A BRAZILIAN TIKTOK SCRIPTWRITER (VIRAL EXPERT).
 
-**OBJECTIVE:** Create 3 VIRAL scripts for:
+**MANDATORY INPUTS:**
 - Product: "${productName}"
-- Benefit: "${mainBenefit}"
+- Main Benefit: "${mainBenefit}"
 - Tone: ${selectedTone}
 
-**RULES:**
-1. Hooks MUST be under 3 seconds.
-2. Use "YOU" language (fale diretamente com o usuário).
-3. Native Brazilian Portuguese (Gírias naturais, nada de 'português traduzido').
-4. NO corporate speak. Use generic internet slang.
+**STRICT RULES FOR VIRALITY:**
+1.  **NO CORPORATE SPEAK:** Do not use words like "inovador", "solução", "qualidade". Use "brabo", "bizarro", "segredo".
+2.  **HOOKS MUST BE < 3 SECONDS:** The first sentence must stop the scroll immediately.
+3.  **NATIVE BRAZILIAN PORTUGUESE:** Use natural slang (gírias) appropriate for the tone.
+4.  **DIRECT ADDRESS:** Use "Você" (You).
 
-**FORMAT (STRICTLY FOLLOW THIS):**
+**FORMAT (JSON-LIKE STRUCTURE FOR PARSING):**
 
 **OPTION 1: THE PATTERN INTERRUPT (Visual Hook)**
-[Scene]: (Describe a visually weird or satisfying action to stop scrolling)
-[Text Overlay]: (Short impactful text)
-[Audio]: "(Script in PT-BR)"
+[Scene]: (Visual description of something weird/satisfying)
+[Text Overlay]: (Big bold text, max 3 words)
+[Audio]: "(Script in PT-BR, casual and fast)"
 
 ---
 
 **OPTION 2: THE SECRET/HACK (Curiosity Hook)**
-[Scene]: (Whispering to camera or showing a hidden detail)
+[Scene]: (Close up whispering or showing hidden feature)
 [Text Overlay]: "Não conte pra ninguém..."
-[Audio]: "(Script in PT-BR)"
+[Audio]: "(Script in PT-BR, conspiratorial tone)"
 
 ---
 
 **OPTION 3: THE DRAMATIC PROBLEM (Relatable Hook)**
-[Scene]: (Person looking frustrated/sad with the 'old way')
+[Scene]: (Person looking frustrated)
 [Text Overlay]: "Cansada de...?"
-[Audio]: "(Script in PT-BR)"`;
+[Audio]: "(Script in PT-BR, empathetic then solution)"`;
 
                 const result = await model.generateContent(scriptPrompt);
                 const response = result.response.text();
@@ -208,14 +213,17 @@ export async function POST(request: NextRequest) {
 
                 imageParts.push(fileToGenerativePart(image, "image/jpeg"));
 
-                const visionPrompt = `Analyze this outfit for a Generative AI prompt. Focus on VISUAL FIDELITY.
-Describe:
-1. The Garment: Exact cut, length, neckline, sleeve style.
-2. Fabric Physics: Weight (heavy/light), texture (satin/knit/denim), how it reflects light.
-3. Colors/Patterns: Specific hex-code vibes (e.g. "Pastel Sage Green" instead of "Green").
-4. Fit: Oversized, bodycon, tailored?
+                const visionPrompt = `ACT AS A SENIOR FASHION STYLIST AND TECHNICAL ANALYST.
+                
+Analyze this outfit for a Generative AI prompt. Focus on VISUAL FIDELITY.
 
-Output ONLY the description. No intro.`;
+**MANDATORY OUTPUT FIELDS:**
+1. **Garment Construction:** Exact cut, length, neckline, sleeve style, closures.
+2. **Fabric Physics:** Weight (heavy/light), sheen (matte/satin), texture (ribbed/smooth).
+3. **Color Accuracy:** Specific vibrant hex-code vibes (e.g. "Chartreuse" instead of "Green").
+4. **Fit Dynamics:** How it sits on the body (draped, tight, structured).
+
+Output ONLY the technical description. No intro.`;
 
                 const visionResult = await model.generateContent([visionPrompt, ...imageParts]);
                 const clothingDescription = visionResult.response.text();
@@ -335,11 +343,11 @@ Morphing, melting hands, text glitches, extra fingers, cartoon, drawing, paintin
                 // Ask Gemini to describe the product
                 const productVisionPrompt = `Describe this product for a video generation prompt.
 Focus on:
-1. OBJECT PERMANENCE: Exact text on labels, logo placement, specific colors.
-2. MATERIAL: Glass reflection, plastic matte, paper texture?
-3. SHAPE: Bottle, Box, Tube?
+1. **Logo Consistency:** Exact text on labels, logo placement, specific colors.
+2. **Material properties:** Glass reflection, plastic matte, paper texture.
+3. **Form Factor:** Bottle shape, box dimensions, tube squeeze state.
 
-Write a dense, comma-separated description.`;
+Write a dense, comma-separated description optimized for text-to-video persistence.`;
 
                 const productResult = await model.generateContent([productVisionPrompt, ...imageParts]);
                 const productDescription = productResult.response.text();
@@ -358,14 +366,15 @@ Write a dense, comma-separated description.`;
                 const audioScript = customScript ? `"${customScript}"` : `(Write a ${currentTone.audioType} mini-review in PT-BR)`;
 
                 if (mediaType === "photo") {
-                    finalPrompt = `**MACRO POV PHOTOGRAPHY**
+                    finalPrompt = `**MACRO POV PHOTOGRAPHY (PRODUCT FOCUSED)**
 
-**SUBJECT:**
+**SUBJECT (MANDATORY):**
 First-person view (POV) of a hand holding: ${productDescription}.
 
-**FIDELITY CHECK:**
+**STRICT FIDELITY RULES:**
 - The product MUST match the description 100%. No hallucinated text.
 - Label text must be legible and sharp.
+- NO warping of the product geometry.
 
 **HAND DETAILS:**
 - Skin texture: Hyper-realistic, visible knuckles and veins.
@@ -451,15 +460,15 @@ Output a comma-separated description focusing on:
                 const audioScript = customScript ? `"${customScript}"` : `(Write a ${currentTone.audio} reaction in PT-BR)`;
 
                 if (mediaType === "photo") {
-                    finalPrompt = `**BEAUTY/LIFESTYLE PORTRAIT**
+                    finalPrompt = `**BEAUTY/LIFESTYLE PORTRAIT (PRODUCT HERO)**
 
-**SUBJECT:**
-${hasInfluencer ? `Specific Influencer: ${influencerDesc}` : "A stunning model"}
+**SUBJECT (MANDATORY):**
+${hasInfluencer ? `**INFLUENCER (STRICT):** ${influencerDesc}` : "A stunning HIGH-FASHION model"}
 Holding product: ${productDesc}.
 
-**POSE:**
+**POSE & COMPOSITION:**
 - Product Placement: Held next to face/cheek (Beauty Youtuber Thumbnail style).
-- Label Visibility: 100% visible to camera.
+- **LABEL VISIBILITY:** 100% visible to camera, sharp text, no glare.
 - Expression: ${currentTone.expression}.
 
 **AESTHETIC:**
@@ -468,12 +477,12 @@ Holding product: ${productDesc}.
 - Camera: Canon R5, 85mm f/1.2 Portrait Lens.
 - Quality: Magazine retouching, sharp eyes, readable product label.`;
                 } else {
-                    finalPrompt = `**VIDEO PROMPT (TESTIMONIAL - FLOW/KLING)**
+                    finalPrompt = `**VIDEO PROMPT (PRODUCT TESTIMONIAL)**
 
 **CHARACTER:**
-${hasInfluencer ? influencerDesc : "Influencer"} reviewing a product.
+${hasInfluencer ? `**INFLUENCER (STRICT):** ${influencerDesc}` : "Professional Influencer"} reviewing a product.
 
-**ACTION:**
+**ACTION KEYFRAMES:**
 1. Influencer defines ${currentTone.expression}.
 2. Holds ${productDesc} up to the camera lens (Macro shot).
 3. Pulls back and points to the product.
@@ -488,10 +497,7 @@ ${audioScript}
 **TECH SPECS:**
 - 4k Resolution.
 - No hand clipping.
-- Accurate product scale.
-
-**NEGATIVE PROMPT:**
-Morphing, melting hands, text glitches, extra fingers, cartoon, drawing, painting, bad physics, distorted face.`;
+- Accurate product scale.`;
                 }
 
                 return NextResponse.json({ prompt: finalPrompt });
@@ -507,36 +513,30 @@ Morphing, melting hands, text glitches, extra fingers, cartoon, drawing, paintin
                     );
                 }
 
-                const scenarioPrompt = `ACT AS A PROFESSIONAL ENVIRONMENT/SCENE DESIGNER FOR AI IMAGE GENERATION.
+                const scenarioPrompt = `ACT AS A PROFESSIONAL ENVIRONMENT/SCENE DESIGNER.
 
-**OBJECTIVE:** Create a highly detailed prompt for generating ONLY an environment/background scene with NO people.
+**OBJECTIVE:** Create a highly detailed prompt for an environment ONLY.
 
-**INPUT DATA:**
+**MANDATORY CONSTRAINTS:**
 - Environment Type: ${environmentType}
 - Visual Style: ${visualStyle}
 - Lighting: ${lighting}
-- Extra Details: ${details || "None"}
-
-**TASK:**
-Generate a comprehensive prompt optimized for Flux/Midjourney/Stable Diffusion.
+- Detail Level: Extreme (8k)
 
 **REQUIRED ELEMENTS:**
-1. **Scene Description:** Detailed view of the ${environmentType}. Be specific about architecture, furniture, objects.
-2. **Visual Style:** Apply ${visualStyle} aesthetic throughout (colors, mood, composition).
-3. **Lighting:** ${lighting} - describe how light interacts with surfaces, creates shadows, highlights textures.
-4. **Textures & Materials:** Specify materials (wood grain, metal finish, fabric weave, glass reflections).
-5. **Color Palette:** Exact color descriptions (avoid generic "blue", use "Deep Navy" or "Powder Blue").
-6. **Depth & Composition:** Foreground, midground, background elements to create depth.
-7. **Atmosphere:** Mood, feeling, ambiance of the space.
+1. **Scene Description:** Detailed view of the ${environmentType}. Be specific about architecture, furniture.
+2. **Visual Style:** Apply ${visualStyle} aesthetic throughout.
+3. **Lighting:** ${lighting}.
+4. **Textures:** Describe materials (wood, glass, fabric) in depth.
 
 **CRITICAL RULES:**
-- NO people, NO human figures, NO body parts visible.
-- Focus on the SPACE itself as the subject.
-- High level of photorealistic detail.
-- Mention camera specs: (e.g., "Shot on Sony A7R IV, 24mm wide angle, f/2.8").
+- NO PEOPLE.
+- NO HUMAN FIGURES.
+- NO BODY PARTS.
+- FOCUS ON THE EMPTY SPACE.
 
 **OUTPUT FORMAT:**
-Provide a single, comma-separated prompt ready for image generation. No explanations, just the prompt.`;
+Single detailed prompt string.`;
 
                 const result = await model.generateContent(scenarioPrompt);
                 const response = result.response.text();
@@ -554,85 +554,77 @@ Provide a single, comma-separated prompt ready for image generation. No explanat
                     );
                 }
 
-                // Parse influencer data if provided
-                let influencerDesc = "";
+                // Parse influencer data more robustly
+                let influencerDesc = "Generic attractive content creator (neutral features)";
                 let hasInfluencer = false;
-                if (influencerJSON) {
+
+                if (influencerJSON && influencerJSON.length > 10) {
                     try {
-                        const influencerData = JSON.parse(influencerJSON);
-                        const subject = influencerData.subject;
-                        influencerDesc = `Specific person: ${subject.gender}, ${subject.age} years old, ${subject.ethnicity}, ${subject.hair?.color || 'styled'} hair, ${subject.eyes?.color || 'expressive'} eyes.`;
-                        hasInfluencer = true;
+                        const parsed = JSON.parse(influencerJSON);
+                        // Handle both full JSON structure or partial
+                        const subject = parsed.subject || parsed;
+
+                        if (subject) {
+                            influencerDesc = `**INFLUENCER IDENTITY (MUST MATCH EXACTLY):**
+                            - Gender: ${subject.gender || 'Not specified'}
+                            - Age: ${subject.age || '25'} years old
+                            - Ethnicity: ${subject.ethnicity || 'Not specified'}
+                            - Hair: ${subject.hair?.color || subject.hair || 'Styled'} 
+                            - Eyes: ${subject.eyes?.color || subject.eyes || 'Expressive'}
+                            - Distinctive Features: ${subject.features_description || 'None'}`;
+                            hasInfluencer = true;
+                        }
                     } catch (e) {
-                        console.log("Invalid influencer JSON, using generic model");
+                        console.log("Error parsing influencer JSON in thumbnail", e);
                     }
                 }
 
-                // Add reference image if provided
                 if (referenceImage) {
                     imageParts.push(fileToGenerativePart(referenceImage, "image/jpeg"));
                 }
 
-                // Expression mapping
+                // Enhanced expression details
                 const expressionDetails: Record<string, string> = {
-                    shocked: "Wide open mouth, raised eyebrows, eyes fully open showing whites, hands on cheeks (Home Alone pose)",
-                    amazed: "Sparkling eyes, slight smile, eyebrows raised in wonder, leaning forward",
-                    mindblown: "Head tilted back, mouth open in awe, both hands on head, eyes wide",
-                    determined: "Intense eye contact, jaw clenched, eyebrows furrowed, confident posture",
-                    emotional: "Glassy eyes, soft smile or slight frown, hand on heart, vulnerable expression",
-                    smirk: "Half smile, one eyebrow raised, knowing look, arms crossed confidently",
-                    excited: "Huge smile, eyes sparkling, possibly jumping or energetic pose",
-                    skeptical: "One eyebrow raised, slight frown, arms crossed, judging look",
-                    laughing: "Big genuine laugh, eyes squinted, head thrown back, mouth wide open",
-                    serious: "Stern face, direct eye contact, no smile, focused intense stare"
+                    shocked: "EXTREME SHOCK: Mouth wide open in an 'O' shape, eyes popping out, hands on cheeks (Home Alone style).",
+                    amazed: "PURE AMAZEMENT: Sparkling eyes, wide smile, eyebrows raised high, leaning forward with intense curiosity.",
+                    mindblown: "MIND BLOWING: Head tilted back, mouth agape, hands exploding from head gesture, eyes extremely wide.",
+                    determined: "INTENSE DETERMINATION: Furrowed brows, piercing stare directly at lens, clenched jaw, serious power pose.",
+                    emotional: "DEEP EMOTION: Glossy eyes (tearing up), soft vulnerable frown, hand over heart, touching moment.",
+                    smirk: "CONFIDENT SMIRK: One eyebrow raised high, half-smile, head tilted slightly down, looking through eyebrows.",
+                    excited: "HYPER EXCITEMENT: Huge open-mouth smile, squinting happy eyes, dynamic energy, motion blur on hands.",
+                    skeptical: "HEAVY SKEPTICISM: One eyebrow raised, lips pursed to side, judging look, chin tucked in.",
+                    laughing: "UNCONTROLLABLE LAUGHTER: Head thrown back, eyes shut tight, mouth wide open, genuine joy.",
+                    serious: "DEAD SERIOUS: Zero emotion, direct intense eye contact, intimidating stare, dramatic lighting."
                 };
 
-                const expressionDetail = expressionDetails[expression] || "Expressive face";
+                const expressionDetail = expressionDetails[expression] || "High energy expressive face";
 
-                const thumbnailPrompt = imageParts.length > 0
-                    ? `Analyze this reference image and create a thumbnail prompt matching this expression.
+                const thumbnailPrompt = `
+                ACT AS A WORLD-CLASS YOUTUBE THUMBNAIL DESIGNER (Top 0.1% CTR).
+                
+                **OBJECTIVE:** 
+                Create a text-to-image prompt for a viral thumbnail. 
+                You must STRICTLY follow the user's constraints below.
 
-**THUMBNAIL SPECS:**
-- Expression: ${expressionDetail}
-- Content Type: ${contentType}
-- Text Overlay: "${thumbnailText}"
-${hasInfluencer ? `- Subject: ${influencerDesc}` : "- Subject: Attractive content creator"}
+                **USER CONSTRAINTS (MANDATORY):**
+                1. **TEXT OVERLAY:** "${thumbnailText}" (Must be legible, big, bold).
+                2. **EXPRESSION:** ${expressionDetail}
+                3. **SUBJECT:** ${influencerDesc}
+                4. **CONTEXT:** ${contentType} style video.
 
-Create a prompt for a HIGH-CTR YouTube/TikTok thumbnail following these rules:
-1. EXTREME CLOSE-UP of face (face fills 70% of frame)
-2. Crystal clear expression matching the reference
-3. High contrast, vibrant saturation
-4. Background: Blurred or simple gradient
-5. Perfect lighting on face (no harsh shadows)
-6. Text space reserved on thirds
-7. 16:9 aspect ratio, 1920x1080px
+                **YOUR TASK:**
+                Write a highly detailed prompt for Midjourney/Flux.
+                
+                **STRUCTURE OF THE PROMPT TO GENERATE:**
+                "[SUBJECT DESCRIPTION] doing [EXPRESSION], extreme close-up, [LIGHTING], [BACKGROUND], text '${thumbnailText}' written on [OBJECT/AIR], high contrast, 8k, hyper-realistic."
 
-Output format: Detailed prompt for thumbnail generation.`
-                    : `ACT AS A VIRAL THUMBNAIL DESIGNER.
+                **CRITICAL RULES:**
+                - If the Subject is an Influencer, you MUST describe their physical traits (Hair, Ethnicity, Eyes) exactly as provided.
+                - The Expression must be EXAGGERATED (YouTube style).
+                - The Text "${thumbnailText}" is the most important element after the face.
 
-**OBJECTIVE:** Create a prompt for a HIGH-CTR YouTube/TikTok thumbnail.
-
-**SPECS:**
-- Expression: ${expressionDetail}
-- Content Type: ${contentType}
-- Text Overlay: "${thumbnailText}"
-${hasInfluencer ? `- Subject: ${influencerDesc}` : "- Subject: Attractive content creator (neutral ethnicity, 25-30 years old)"}
-
-**THUMBNAIL REQUIREMENTS:**
-1. **Framing:** EXTREME close-up portrait. Face fills 70% of the frame. Direct eye contact with camera.
-2. **Expression:** ${expressionDetail}. Make it EXAGGERATED and CLEAR from a distance.
-3. **Lighting:** Ring light or 3-point studio lighting. Face must be brightly lit, no harsh shadows.
-4. **Colors:** High saturation, high contrast. Pop off the screen.
-5. **Background:** Simple blurred background or solid gradient. Don't compete with face.
-6. **Text Space:** Leave clear space on top or bottom third for text overlay: "${thumbnailText}"
-7. **Quality:** 16:9 aspect ratio, 1920x1080px, hyper-realistic, sharp focus on eyes.
-8. **Emotion Clarity:** The ${expression} expression must be instantly readable even at small size.
-
-**NEGATIVE PROMPT:**
-Low contrast, dim lighting, blurry, multiple people, cluttered background, face too small, generic expression.
-
-**OUTPUT:**
-Provide a single detailed prompt optimized for Midjourney/Flux/DALL-E 3 for thumbnail generation. Comma-separated format.`;
+                **OUTPUT:** 
+                Provide ONLY the final prompt string. No explanations.`;
 
                 const promptToUse = imageParts.length > 0
                     ? [thumbnailPrompt, ...imageParts]
@@ -678,71 +670,40 @@ Provide a single detailed prompt optimized for Midjourney/Flux/DALL-E 3 for thum
                 const petsPrompt = imageParts.length > 0
                     ? `Analyze this pet photo and create a viral TikTok/Instagram prompt.
 
-**PET SPECS:**
+**PET IDENTITY (MANDATORY):**
 - Type: ${petType}
-- Breed/Description: ${breed}
+- Breed: ${breed}
 - Action: ${action}
 - Scenario: ${scenario}
-- Personality: ${personality} (${currentPersonality.mood})
-${details ? `- Extra Details: ${details}` : ""}
 
 **REQUIREMENTS:**
-1. Analyze the photo to capture the pet's unique features
-2. ${currentPersonality.camera}
-3. Lighting: ${currentPersonality.lighting}
-4. Focus on cuteness/viral factors (big eyes, fluffy fur, adorable expression)
-5. Natural pet behavior, realistic poses
-6. High-quality photography: Sony A7III, 50mm f/1.8
+1. **VISUAL FIDELITY:** Capture the pet's unique markings/colors from the photo.
+2. **ACTION:** ${action} (Make it dynamic/cute).
+3. **LIGHTING:** ${currentPersonality.lighting}.
+4. **STYLE:** ${currentPersonality.camera}.
 
-**OUTPUT:** Detailed prompt for generating this pet in the specified action/scenario, matching the photo's characteristics.`
+**OUTPUT:** Detailed prompt for generating this SPECIFIC pet in the specified action.`
                     : `ACT AS A VIRAL PET CONTENT CREATOR.
 
-**OBJECTIVE:** Create a prompt for generating adorable, shareable pet content for TikTok/Instagram.
+**OBJECTIVE:** Create a prompt for generating adorable, shareable pet content.
 
-**PET DETAILS:**
+**MANDATORY SPECS:**
 - Type: ${petType}
-- Breed/Description: ${breed}
+- Breed: ${breed}
 - Action: ${action}
 - Scenario: ${scenario}
-- Personality/Vibe: ${personality}
-${details ? `- Extra Details: ${details}` : ""}
+- Vibe: ${personality}
 
-**PROMPT REQUIREMENTS:**
+**PROMPT STRUCTURE:**
+"[BREED], [ACTION] in [SCENARIO], [CAMERA ANGLE], [LIGHTING], [MOOD], highly detailed fur/feathers, 8k, photorealistic."
 
-1. **Pet Description:**
-   - Specific breed characteristics (${breed})
-   - Adorable features (big expressive eyes, fluffy fur/feathers, cute nose/mouth)
-   - Natural, healthy appearance
-   - Age-appropriate look (puppy/kitten vs adult)
-
-2. **Action/Pose:**
-   - Engaged in: ${action}
-   - Natural pet behavior (no forced/uncomfortable poses)
-   - Capture the ${personality} personality
-
-3. **Environment:**
-   - Setting: ${scenario}
-   - Background should complement but not distract from pet
-   - Appropriate props if relevant to action
-
-4. **Photography Specs:**
-   - Camera: ${currentPersonality.camera}
-   - Lighting: ${currentPersonality.lighting}
-   - Quality: High-resolution, sharp focus on pet's eyes
-   - Mood: ${currentPersonality.mood}
-   - Sensor: Pet portrait specialist camera (Sony A7 series, 50mm or 85mm lens)
-
-5. **Viral Factors:**
-   - Maximize "aww factor"
-   - Relatable pet moments
-   - Shareable/meme potential
-   - Clear emotional connection
-
-**NEGATIVE PROMPT:**
-Deformed animals, extra limbs, unnatural anatomy, sad/sick appearance, scary, aggressive, poor lighting, blurry, low quality, watermark.
+**CRITICAL RULES:**
+- Maximize "Cuteness Factor".
+- Ensure natural anatomy (4 legs, correct ears).
+- focus on eyes.
 
 **OUTPUT:**
-Single detailed prompt optimized for Flux/Midjourney/DALL-E 3. Comma-separated format.`;
+Single detailed prompt.`;
 
                 const promptToUse = imageParts.length > 0
                     ? [petsPrompt, ...imageParts]

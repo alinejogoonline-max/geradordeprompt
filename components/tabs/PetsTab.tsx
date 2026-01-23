@@ -73,7 +73,7 @@ export default function PetsTab({ onGenerate, isLoading, onError }: PetsTabProps
                     onImageSelect={handlePhotoSelect}
                     onImageRemove={handlePhotoRemove}
                     currentImage={petPhoto}
-                    label="Foto do Pet (opcional) 📸"
+                    label="Foto do Pet (opcional)"
                 />
                 <p className="text-xs text-gray-500 mt-2">
                     💡 Upload de uma foto do seu pet para geração mais precisa
@@ -83,7 +83,7 @@ export default function PetsTab({ onGenerate, isLoading, onError }: PetsTabProps
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Pet Type */}
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-300 ml-1">🐾 Tipo de Pet</label>
+                    <label className="text-sm font-semibold text-gray-300 ml-1">Tipo de Pet</label>
                     <select
                         value={petType}
                         onChange={(e) => setPetType(e.target.value)}
@@ -120,7 +120,7 @@ export default function PetsTab({ onGenerate, isLoading, onError }: PetsTabProps
                 {/* Breed/Description */}
                 <div className="space-y-2">
                     <label className="text-sm font-semibold text-gray-300 ml-1">
-                        🎨 Raça/Descrição <span className="text-cyan-400">*</span>
+                        Raça/Descrição <span className="text-cyan-400">*</span>
                     </label>
                     <input
                         type="text"
@@ -139,7 +139,7 @@ export default function PetsTab({ onGenerate, isLoading, onError }: PetsTabProps
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Action/Activity */}
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-300 ml-1">⚡ Ação/Atividade</label>
+                    <label className="text-sm font-semibold text-gray-300 ml-1">Ação/Atividade</label>
                     <select
                         value={action}
                         onChange={(e) => setAction(e.target.value)}
@@ -163,7 +163,7 @@ export default function PetsTab({ onGenerate, isLoading, onError }: PetsTabProps
 
                 {/* Personality/Vibe */}
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-300 ml-1">✨ Personalidade/Vibe</label>
+                    <label className="text-sm font-semibold text-gray-300 ml-1">Personalidade/Vibe</label>
                     <select
                         value={personality}
                         onChange={(e) => setPersonality(e.target.value)}
@@ -186,7 +186,7 @@ export default function PetsTab({ onGenerate, isLoading, onError }: PetsTabProps
 
             {/* Scenario/Location */}
             <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-300 ml-1">📍 Cenário/Local</label>
+                <label className="text-sm font-semibold text-gray-300 ml-1">Cenário/Local</label>
                 <select
                     value={scenario}
                     onChange={(e) => setScenario(e.target.value)}
@@ -245,7 +245,7 @@ export default function PetsTab({ onGenerate, isLoading, onError }: PetsTabProps
                 disabled={isLoading || !petType || !breed.trim()}
                 className="group relative w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-5 rounded-2xl transition-all transform hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] disabled:scale-100 shadow-xl hover:shadow-2xl hover:shadow-cyan-500/50 overflow-hidden disabled:cursor-not-allowed"
             >
-                {isLoading ? "Gerando Prompt..." : "🐾 Gerar Prompt de Pet"}
+                {isLoading ? "Gerando Prompt..." : "Gerar Prompt de Pet"}
             </button>
         </div>
     );

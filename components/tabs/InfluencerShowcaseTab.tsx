@@ -58,7 +58,7 @@ export default function InfluencerShowcaseTab({ onGenerate, isLoading, onError }
                 onImageSelect={handleImageSelect}
                 onImageRemove={handleImageRemove}
                 currentImage={productImage}
-                label="Upload do Produto 📦"
+                label="Upload do Produto"
             />
 
             {/* Influencer JSON Field - OPCIONAL */}
@@ -136,7 +136,7 @@ export default function InfluencerShowcaseTab({ onGenerate, isLoading, onError }
                             }`}
                     >
                         <Camera className="w-5 h-5" />
-                        <span>📸 FOTO</span>
+                        <span>FOTO</span>
                     </button>
                     <button
                         type="button"
@@ -148,7 +148,7 @@ export default function InfluencerShowcaseTab({ onGenerate, isLoading, onError }
                             }`}
                     >
                         <Video className="w-5 h-5" />
-                        <span>🎥 VÍDEO</span>
+                        <span>VÍDEO</span>
                     </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
@@ -163,7 +163,7 @@ export default function InfluencerShowcaseTab({ onGenerate, isLoading, onError }
                 disabled={isLoading}
                 className="btn-liquid w-full py-5 rounded-2xl text-white font-bold text-lg tracking-wide shadow-lg hover:shadow-accent-pink/50 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
-                {isLoading ? "Gerando com Gemini Vision..." : `✨ Gerar Testimonial ${mediaType === "photo" ? "Foto" : "Vídeo"}`}
+                {isLoading ? "Gerando com Gemini Vision..." : `Gerar Testimonial ${mediaType === "photo" ? "Foto" : "Vídeo"}`}
             </button>
         </div>
     );

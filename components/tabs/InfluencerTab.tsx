@@ -73,7 +73,7 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
                     onImageSelect={handlePhotoSelect}
                     onImageRemove={handlePhotoRemove}
                     currentImage={referencePhoto}
-                    label="Foto de Referência (opcional) 📸"
+                    label="Foto de Referência (opcional)"
                 />
                 <p className="text-xs text-gray-500 mt-2">
                     💡 Opcional: Se enviada, será incluída no JSON para referência visual
@@ -160,7 +160,7 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
             {/* Location/Setting */}
             <div className="space-y-2">
                 <label className="text-sm font-semibold text-gray-300 ml-1 flex items-center gap-2">
-                    📍 Local/Cenário
+                    Local/Cenário
                 </label>
                 <select
                     value={location}
@@ -232,7 +232,7 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
                 disabled={isLoading || !gender || !ethnicity || !hairColor || !eyeColor}
                 className="group relative w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-5 rounded-2xl transition-all transform hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] disabled:scale-100 shadow-xl hover:shadow-2xl hover:shadow-purple-500/50 overflow-hidden elevation-medium disabled:elevation-low"
             >
-                {isLoading ? "Gerando JSON..." : "🎯 Gerar JSON do Influencer"}
+                {isLoading ? "Gerando JSON..." : "Gerar JSON do Influencer"}
             </button>
         </div >
     );
