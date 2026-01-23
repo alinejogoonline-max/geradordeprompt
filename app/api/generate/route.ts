@@ -429,61 +429,60 @@ NO morphing labels. NO melting fingers. The product must remain solid rigid obje
 Morphing, melting hands, text glitches, extra fingers, cartoon, drawing, painting, bad physics, low resolution, blurry.`;
                     }
                 }
-            }
 
                 return NextResponse.json({ prompt: finalPrompt });
-        }
-
-            case "showcase": {
-            const { productImage, mediaType, influencerJSON, customScript, tone, duration } = data;
-
-            if (!productImage) {
-                return NextResponse.json(
-                    { error: "Faça o upload do produto" },
-                    { status: 400 }
-                );
             }
 
-            // Add product image for Gemini Vision
-            imageParts.push(fileToGenerativePart(productImage, "image/jpeg"));
+            case "showcase": {
+                const { productImage, mediaType, influencerJSON, customScript, tone, duration } = data;
 
-            const productPrompt = `Analyze this product image.
+                if (!productImage) {
+                    return NextResponse.json(
+                        { error: "Faça o upload do produto" },
+                        { status: 400 }
+                    );
+                }
+
+                // Add product image for Gemini Vision
+                imageParts.push(fileToGenerativePart(productImage, "image/jpeg"));
+
+                const productPrompt = `Analyze this product image.
 Output a comma-separated description focusing on:
 1. PRODUCT TYPE (Bottle, Box, Jar, Device)
 2. BRAND COLORS (Exact hex vibes)
 3. MATERIAL (Matte plastic, clear glass, metallic)
 4. LABEL TEXT (What is written on it?)`;
-            const productResult = await model.generateContent([productPrompt, ...imageParts]);
-            const productDesc = productResult.response.text();
+                const productResult = await model.generateContent([productPrompt, ...imageParts]);
+                const productDesc = productResult.response.text();
 
-            let influencerDesc = "";
-            let hasInfluencer = false;
-            if (influencerJSON) {
-                try {
-                    const influencerData = JSON.parse(influencerJSON);
-                    const subject = influencerData.subject;
-                    influencerDesc = `(${subject.gender}, ${subject.age}y, ${subject.ethnicity}, ${subject.hair.color}, ${subject.eyes.color} eyes)`;
-                    hasInfluencer = true;
-                } catch (e) {
-                    console.log("Invalid JSON");
+                let influencerDesc = "";
+                let hasInfluencer = false;
+                if (influencerJSON) {
+                    try {
+                        const influencerData = JSON.parse(influencerJSON);
+                        const subject = influencerData.subject;
+                        influencerDesc = `(${subject.gender}, ${subject.age}y, ${subject.ethnicity}, ${subject.hair.color}, ${subject.eyes.color} eyes)`;
+                        hasInfluencer = true;
+                    } catch (e) {
+                        console.log("Invalid JSON");
+                    }
                 }
-            }
 
-            // Tone Mapping for Showcase
-            const toneVisuals: Record<string, { mood: string; expression: string; audio: string }> = {
-                energetic: { mood: "Vibrant, Pop Art", expression: "Wide smile, surprised eyes (Pog face)", audio: "Shocked" },
-                professional: { mood: "Clean, Clinical, White", expression: "Confident, soft smile", audio: "Expert" },
-                humorous: { mood: "Playful, Colorful", expression: "Winking or making a funny face", audio: "Joking" },
-                emotional: { mood: "Warm, Golden, Cozy", expression: "Soft smile, looking lovingly at product", audio: "Loving" },
-                urgent: { mood: "Intense, High Contrast", expression: "Serious, pointing urgently", audio: "Warning" },
-                asmr: { mood: "Dim, Bedroom, RGB", expression: "Relaxed, closed eyes smell test", audio: "Soft" }
-            };
+                // Tone Mapping for Showcase
+                const toneVisuals: Record<string, { mood: string; expression: string; audio: string }> = {
+                    energetic: { mood: "Vibrant, Pop Art", expression: "Wide smile, surprised eyes (Pog face)", audio: "Shocked" },
+                    professional: { mood: "Clean, Clinical, White", expression: "Confident, soft smile", audio: "Expert" },
+                    humorous: { mood: "Playful, Colorful", expression: "Winking or making a funny face", audio: "Joking" },
+                    emotional: { mood: "Warm, Golden, Cozy", expression: "Soft smile, looking lovingly at product", audio: "Loving" },
+                    urgent: { mood: "Intense, High Contrast", expression: "Serious, pointing urgently", audio: "Warning" },
+                    asmr: { mood: "Dim, Bedroom, RGB", expression: "Relaxed, closed eyes smell test", audio: "Soft" }
+                };
 
-            const currentTone = toneVisuals[tone || "energetic"];
-            const audioScript = customScript ? `"${customScript}"` : `(Write a ${currentTone.audio} reaction in PT-BR)`;
+                const currentTone = toneVisuals[tone || "energetic"];
+                const audioScript = customScript ? `"${customScript}"` : `(Write a ${currentTone.audio} reaction in PT-BR)`;
 
-            if (mediaType === "photo") {
-                finalPrompt = `**BEAUTY/LIFESTYLE PORTRAIT (PRODUCT HERO)**
+                if (mediaType === "photo") {
+                    finalPrompt = `**BEAUTY/LIFESTYLE PORTRAIT (PRODUCT HERO)**
 
 **SUBJECT (MANDATORY):**
 ${hasInfluencer ? `**INFLUENCER (STRICT):** ${influencerDesc}` : "A stunning HIGH-FASHION model"}
@@ -499,12 +498,12 @@ Holding product: ${productDesc}.
 - Mood: ${currentTone.mood}.
 - Camera: Canon R5, 85mm f/1.2 Portrait Lens.
 - Quality: Magazine retouching, sharp eyes, readable product label.`;
-            } else {
-                const totalDuration = parseInt(duration || "8");
-                const clips = Math.ceil(totalDuration / 8);
+                } else {
+                    const totalDuration = parseInt(duration || "8");
+                    const clips = Math.ceil(totalDuration / 8);
 
-                if (clips > 1) {
-                    finalPrompt = `ACT AS A VIDEO DIRECTOR.
+                    if (clips > 1) {
+                        finalPrompt = `ACT AS A VIDEO DIRECTOR.
 **OBJECTIVE:** Create ${clips} sequential prompts for a ${totalDuration}s product showcase.
 
 **CONTEXT:**
@@ -522,8 +521,8 @@ Clip 3+ (16s+): Influencer reaction/result.
 **MANDATORY:**
 - Influencer face consistency.
 - Product label consistency.`;
-                } else {
-                    finalPrompt = `**VIDEO PROMPT (PRODUCT TESTIMONIAL)**
+                    } else {
+                        finalPrompt = `**VIDEO PROMPT (PRODUCT TESTIMONIAL)**
 
 **CHARACTER:**
 ${hasInfluencer ? `**INFLUENCER (STRICT):** ${influencerDesc}` : "Professional Influencer"} reviewing a product.
@@ -544,10 +543,10 @@ ${audioScript}
 - 4k Resolution.
 - No hand clipping.
 - Accurate product scale.`;
-                }
+                    }
 
-                return NextResponse.json({ prompt: finalPrompt });
-            }
+                    return NextResponse.json({ prompt: finalPrompt });
+                }
 
             case "scenario": {
                 const { environmentType, visualStyle, lighting, details } = data;
@@ -762,10 +761,10 @@ Single detailed prompt.`;
             }
 
             default:
-            return NextResponse.json(
-                { error: "Tipo de tab inválido" },
-                { status: 400 }
-            );
+                return NextResponse.json(
+                    { error: "Tipo de tab inválido" },
+                    { status: 400 }
+                );
         }
     } catch (error: any) {
         console.error("Erro ao gerar prompt:", error);
