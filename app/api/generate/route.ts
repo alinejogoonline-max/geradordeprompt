@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
                 // Generate high-fidelity JSON via Gemini to ensure translation and stereotype breaking
                 const influencerPrompt = `
                 ACT AS A WORLD-CLASS AI PROMPT ENGINEER.
-                Create a high-fidelity JSON profile for an influencer.
+                Create a high-fidelity JSON profile for an influencer focused on EXTREME REALISM (Anti-AI look).
 
                 **MANDATORY CONSTRAINTS:**
                 - Gender: "${gender}" (MUST be respected)
@@ -64,16 +64,17 @@ export async function POST(request: NextRequest) {
                 Generate a high-fidelity JSON object for image generation.
                 translate ALL Portuguese terms to English visual descriptors.
 
-                **STRATEGY:**
-                1. Break strict stereotypes if inputs conflict (e.g. Japanese + Blue Eyes = Colored Contacts/Anime style or Rare genetics).
-                2. Ensure "Extra Details" are prominently featured in the 'features_description'.
-                3. Create a consistency-ready output.
+                **STRATEGY - THE "ANTI-PLASTIC" PROTOCOL:**
+                1.  **TEXTURE IS KING:** You MUST emphasize skin texture, pores, vellus hair, and natural imperfections.
+                2.  **LIGHTING IMPERFECTION:** Avoid perfect studio lighting. Use terms like "harsh sunlight", "mixed lighting", "flash photography" if appropriate.
+                3.  **BREAK THE AI LOOK:** Avoid "smooth", "perfect", "symmetrical".
+                4.  **Enforce "Extra Details"**: prominently featured in the 'features_description'.
 
                 **JSON STRUCTURE:**
                 {
                     "image_type": "portrait",
-                    "style": "high-end lifestyle photography",
-                    "realism_level": "hyper realistic 8k",
+                    "style": "Raw Flash Photography / Editorial",
+                    "realism_level": "Analog Film aesthetic, Fujifilm GFX 100",
                     "subject": {
                         "gender": "...",
                         "age": "...",
@@ -81,35 +82,35 @@ export async function POST(request: NextRequest) {
                         "features_description": "...",
                         "hair": {
                             "color": "...",
-                            "style": "stylish modern cut",
-                            "physics": "natural flow",
-                            "texture": "individual strands visible"
+                            "style": "messy/natural flow",
+                            "physics": "wind blown / gravity affected",
+                            "texture": "frizzy strands / individual hairs visible"
                         },
                         "eyes": {
                             "color": "...",
-                            "style": "sharp focus, reflections of ring light"
+                            "style": "visible capillaries, natural moisture, not glowing"
                         },
                         "skin_texture": {
-                            "style": "raw photography",
-                            "details": ["visible pores", "micro-imperfections", "subsurface scattering"]
+                            "style": "Hyper-detailed raw skin",
+                            "details": ["visible pores", "vellus hair (peach fuzz)", "slight sweat/oil", "sun spots", "natural redness"]
                         },
                         "face": {
-                            "proportions": "golden ratio",
-                            "expression": "approachable soft confidence"
+                            "proportions": "natural asymmetry",
+                            "expression": "candid, non-posed look"
                         },
-                        // Add makeup if female, grooming if male
+                        // Add makeup if female, grooming if male (but keep it realistic, e.g. "mascara clumps" or "stubble")
                     },
                     "environment": {
-                        "background": "... (Use the Location/Setting input to determine the background scene. Be specific and descriptive)",
+                        "background": "... (Use the Location/Setting input. Add clutter/mess/real world elements)",
                         "lighting": {
-                            "type": "Rembrandt lighting",
-                            "style": "cinematic softbox (adjust based on location - e.g., natural sunlight for beach, warm interior lights for cafe)"
+                            "type": "Natural / Practical sources",
+                            "style": "Hard shadows, dynamic range, not flat"
                         }
                     },
                     "camera": {
-                        "sensor": "Sony A7R IV",
-                        "lens": "85mm G Master",
-                        "quality": "raw photo"
+                        "sensor": "35mm Film Grain / Kodak Portra 400",
+                        "lens": "50mm Prime",
+                        "quality": "chromatic aberration, motion blur (slight)"
                     }
                 }
 
@@ -234,7 +235,12 @@ Output ONLY the technical description. No intro.`;
                     try {
                         const influencerData = JSON.parse(influencerJSON);
                         const subject = influencerData.subject;
-                        influencerDesc = `(${subject.gender}, ${subject.age}y, ${subject.ethnicity}, ${subject.hair.color} ${subject.hair.style}, ${subject.eyes.color} eyes, ${subject.body_type} body).`;
+
+                        // Extract realism details
+                        const skinDetails = subject.skin_texture?.details?.join(", ") || "visible pores, vellus hair, textured skin";
+                        const features = subject.features_description || "unique features";
+
+                        influencerDesc = `(${subject.gender}, ${subject.age}y, ${subject.ethnicity}, ${features}. Hair: ${subject.hair.color} ${subject.hair.style}. Skin: ${skinDetails}).`;
                         hasInfluencer = true;
                     } catch (e) {
                         console.log("Invalid influencer JSON");
@@ -300,7 +306,10 @@ ${clothingDescription}
 - Camera: Sony A7R V, 35mm f/1.4 GM Lens.
 - Quality: 8k, Raw Photo, Hyper-detailed skin texture (pores, vellus hair), Ray-traced reflections.
 - Framing: Full body mirror selfie (Mirror reflection visible).
-- Style: Influencer Instagram Story aesthetic.`;
+- Style: Influencer Instagram Story aesthetic.
+
+**NEGATIVE PROMPT:**
+Plastic skin, 3d render, cartoon, doll, smooth skin, airbrushed, blur, low quality.`;
                 } else {
                     finalPrompt = `**VIDEO PROMPT (KLING/LUMA/RUNWAY/FLOW)**
 
@@ -461,7 +470,11 @@ Output a comma-separated description focusing on:
                     try {
                         const influencerData = JSON.parse(influencerJSON);
                         const subject = influencerData.subject;
-                        influencerDesc = `(${subject.gender}, ${subject.age}y, ${subject.ethnicity}, ${subject.hair.color}, ${subject.eyes.color} eyes)`;
+
+                        // Extract realism details
+                        const skinDetails = subject.skin_texture?.details?.join(", ") || "visible pores, vellus hair";
+
+                        influencerDesc = `(${subject.gender}, ${subject.age}y, ${subject.ethnicity}, ${subject.features_description}. Skin: ${skinDetails})`;
                         hasInfluencer = true;
                     } catch (e) {
                         console.log("Invalid JSON");
