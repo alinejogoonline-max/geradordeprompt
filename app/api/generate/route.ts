@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         let prompt = "";
-        let imageParts = [];
+        let imageParts: any[] = [];
         let finalPrompt = "";
 
         // Handle different tab types
