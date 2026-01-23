@@ -303,7 +303,7 @@ ${clothingDescription}
 - Atmosphere: ${currentTone.vibe}.
 
 **PHOTOGRAPHY SPECS:**
-- Camera: Sony A7R V, 35mm f/1.4 GM Lens.
+- Camera: Sony A7R V, 35mm f/8 GM Lens (Deep Focus).
 - Quality: 8k, Raw Photo, Hyper-detailed skin texture (pores, vellus hair), Ray-traced reflections.
 - Framing: Full body mirror selfie (Mirror reflection visible).
 - Style: Influencer Instagram Story aesthetic.
@@ -391,8 +391,8 @@ First-person view (POV) of a hand holding: ${productDescription}.
 
 **SCENE:**
 - Lighting: ${currentTone.lighting}.
-- Background: High quality gaussian blur (Bokeh). Focus solely on product.
-- Lens: 105mm Macro f/2.8.`;
+- Background: Visible and Detailed (Wide depth of field). Use ${currentTone.lighting} to illuminate the room.
+- Lens: 24mm Wide Angle f/8 (Deep focus).`;
                 } else {
                     const totalDuration = parseInt(duration || "8");
                     const clips = Math.ceil(totalDuration / 8);

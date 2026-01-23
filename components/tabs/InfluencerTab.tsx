@@ -118,16 +118,23 @@ export default function InfluencerTab({ onGenerate, isLoading, onError }: Influe
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Ethnicity */}
+                {/* Ethnicity / Skin Tone */}
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-300 ml-1">Etnia</label>
-                    <input
-                        type="text"
+                    <label className="text-sm font-semibold text-gray-300 ml-1">Tom de Pele / Etnia</label>
+                    <select
                         value={ethnicity}
                         onChange={(e) => setEthnicity(e.target.value)}
-                        placeholder="Ex: Latina, Asiática..."
-                        className="w-full px-5 py-4 bg-white/5 border-2 border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-200 placeholder:text-gray-600"
-                    />
+                        className="w-full px-5 py-4 bg-[#0a0a0f] border-2 border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-200 appearance-none"
+                    >
+                        <option value="" disabled>Selecione...</option>
+                        <option value="Light Skin (Caucasian)">Pele Clara (Caucasiano)</option>
+                        <option value="Medium/Tan Skin (Latino/Hispanic)">Pele Morena (Latino)</option>
+                        <option value="Dark Skin (Afro-descendant)">Pele Negra (Afro)</option>
+                        <option value="Very Dark Skin (Deep Melanin)">Pele Retinta</option>
+                        <option value="Light Skin (Asian)">Asiático (Pele Clara)</option>
+                        <option value="Tan Skin (South Asian/Indian)">Sul Asiático (Indiano)</option>
+                        <option value="Olive Skin (Mediterranean/Middle Eastern)">Pele Oliva (Oriente Médio)</option>
+                    </select>
                 </div>
 
                 {/* Hair Color */}
